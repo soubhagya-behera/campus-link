@@ -1,0 +1,248 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Enums ----------
+
+enum Role {
+  STUDENT
+  STAFF
+  RECRUITER
+  ADMIN
+}
+
+enum JobType {
+  INTERNSHIP
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+}
+
+enum JobStatus {
+  DRAFT
+  OPEN
+  CLOSED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  SHORTLISTED
+  REJECTED
+  HIRED
+  WITHDRAWN
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum AttemptStatus {
+  STARTED
+  SUBMITTED
+  EVALUATED
+}
+
+enum InterviewType {
+  HR
+  TECHNICAL
+  MANAGERIAL
+  MOCK
+}
+
+// ---------- Users & roles ----------
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(STUDENT)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  studentProfile StudentProfile?
+  assessments    Assessment[]    @relation("AssessmentAuthor")
+
+  @@index([role])
+}
+
+model StudentProfile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName       String
+  enrollmentNo   String?  @unique
+  branch         String?
+  graduationYear Int?
+  cgpa           Float?
+  resumeUrl      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  skills     StudentSkill[]
+  projects   Project[]
+  apps       Application[]
+  attempts   AssessmentAttempt[]
+  interviews InterviewSession[]
+
+  @@index([graduationYear])
+  @@index([branch])
+}
+
+// ---------- Skills & evidence ----------
+
+model Skill {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  students StudentSkill[]
+}
+
+model StudentSkill {
+  id               String     @id @default(cuid())
+  studentProfileId String
+  skillId          String
+  level            SkillLevel @default(INTERMEDIATE)
+
+  student StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  skill   Skill          @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([studentProfileId, skillId])
+  @@index([skillId])
+}
+
+model Project {
+  id               String   @id @default(cuid())
+  studentProfileId String
+  title            String
+  description      String?
+  url              String?
+  /// Skill names this project evidences (kept as names for readable, explainable matching).
+  skills           String[] @default([])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  student StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+
+  @@index([studentProfileId])
+}
+
+// ---------- Companies & jobs ----------
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  website   String?
+  industry  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  jobs JobOpportunity[]
+}
+
+model JobOpportunity {
+  id          String    @id @default(cuid())
+  companyId   String
+  title       String
+  description String
+  location    String?
+  type        JobType   @default(FULL_TIME)
+  status      JobStatus @default(OPEN)
+  salary      String?
+  deadline    DateTime?
+  /// Explicit hiring criteria: [{ "skill": "React", "minLevel": "INTERMEDIATE" }].
+  /// Stored on the record so every match score is inspectable, never a black box.
+  requiredSkills Json     @default("[]")
+  niceToHave     String[] @default([])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  company Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  apps    Application[]
+
+  @@index([companyId])
+  @@index([status])
+  @@index([type])
+}
+
+model Application {
+  id               String            @id @default(cuid())
+  jobId            String
+  studentProfileId String
+  status           ApplicationStatus @default(APPLIED)
+  appliedAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  job     JobOpportunity @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  student StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, studentProfileId])
+  @@index([studentProfileId])
+  @@index([status])
+}
+
+// ---------- Assessments ----------
+
+model Assessment {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  /// Skill this challenge evidences; 70+ promotes it one level + records a project.
+  rewardSkill String
+  authorId    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author   User?               @relation("AssessmentAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  attempts AssessmentAttempt[]
+
+  @@index([authorId])
+}
+
+model AssessmentAttempt {
+  id               String        @id @default(cuid())
+  assessmentId     String
+  studentProfileId String
+  score            Float?
+  status           AttemptStatus @default(STARTED)
+  /// Submitted artefact link + write-up (persisted; scored by the documented rubric).
+  repoUrl          String?
+  note             String?
+  /// Human/machine-readable grading notes (rule-based rubric — never labeled as AI).
+  feedback         String?
+  startedAt        DateTime      @default(now())
+  submittedAt      DateTime?
+
+  assessment Assessment     @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  student    StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+
+  @@index([assessmentId])
+  @@index([studentProfileId])
+  @@index([status])
+}
+
+// ---------- Interview practice ----------
+
+model InterviewSession {
+  id               String        @id @default(cuid())
+  studentProfileId String
+  type             InterviewType @default(MOCK)
+  transcript       String?
+  feedback         String?
+  score            Float?
+  createdAt        DateTime      @default(now())
+
+  student StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+
+  @@index([studentProfileId])
+  @@index([type])
+}
