@@ -12,6 +12,8 @@ export interface RubricResult {
   feedback: string[];
 }
 
+export const RUBRIC_VERSION = "rubric-v1";
+
 export const RUBRIC_DESCRIPTION =
   "Rule-based rubric (no AI): completion 25, verifiable link 15, write-up depth 15, " +
   "quality-attribute mention 5, on a 40 base. 70+ promotes the rewarded skill one level " +

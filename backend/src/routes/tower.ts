@@ -1,6 +1,7 @@
 import { Router } from "express";
 import prisma from "../lib/prisma.js";
 import { LEVEL_RANK } from "../lib/match.js";
+import { requireAuth, requireRole } from "../lib/auth.js";
 
 const router = Router();
 
@@ -8,7 +9,7 @@ const router = Router();
  * GET /api/tower/stats — KPIs computed from persisted records only.
  * Includes an explicit seed marker so demo content is never mistaken for outcomes.
  */
-router.get("/stats", async (_req, res, next) => {
+router.get("/stats", requireAuth, requireRole("STAFF", "ADMIN"), async (_req, res, next) => {
   try {
     const [students, jobs, apps, byStatus, profiles] = await Promise.all([
       prisma.studentProfile.count(),

@@ -2,26 +2,39 @@ import { Router } from "express";
 import { z } from "zod";
 import prisma from "../lib/prisma.js";
 import { nextLevel } from "../lib/match.js";
-import { PROMOTION_THRESHOLD, RUBRIC_DESCRIPTION, gradeSubmission } from "../lib/rubric.js";
-import { sendInvalid } from "../lib/validate.js";
+import { PROMOTION_THRESHOLD, RUBRIC_DESCRIPTION, RUBRIC_VERSION, gradeSubmission } from "../lib/rubric.js";
+import { parsePaging, sendInvalid } from "../lib/validate.js";
+import { requireAuth, resolveStudentScope } from "../lib/auth.js";
 
 const router = Router();
 
-/** GET /api/attempts?studentProfileId=&assessmentId= — persisted submissions + scores. */
-router.get("/", async (req, res, next) => {
+/** GET /api/attempts — owner or placement only (recruiters have no access). */
+router.get("/", requireAuth, async (req, res, next) => {
   try {
-    const studentProfileId = String(req.query.studentProfileId ?? "").trim();
+    const { page, limit } = parsePaging(req);
+    const requested = String(req.query.studentProfileId ?? "").trim();
     const assessmentId = String(req.query.assessmentId ?? "").trim();
-    const rows = await prisma.assessmentAttempt.findMany({
-      where: {
-        ...(studentProfileId ? { studentProfileId } : {}),
-        ...(assessmentId ? { assessmentId } : {}),
-      },
-      orderBy: { startedAt: "desc" },
-      take: 50,
-      include: { assessment: { select: { id: true, title: true, rewardSkill: true } } },
-    });
-    res.json({ ok: true, rubric: RUBRIC_DESCRIPTION, data: rows });
+    // Students see only their own; placement may filter any profile.
+    const studentProfileId =
+      req.auth?.role === "STUDENT"
+        ? resolveStudentScope(req, res, requested || (req.auth.studentProfileId ?? ""))
+        : requested;
+    if (req.auth?.role === "STUDENT" && !studentProfileId) return;
+    const where = {
+      ...(studentProfileId ? { studentProfileId } : {}),
+      ...(assessmentId ? { assessmentId } : {}),
+    };
+    const [total, rows] = await Promise.all([
+      prisma.assessmentAttempt.count({ where }),
+      prisma.assessmentAttempt.findMany({
+        where,
+        orderBy: { startedAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: { assessment: { select: { id: true, title: true, rewardSkill: true } } },
+      }),
+    ]);
+    res.json({ ok: true, rubric: RUBRIC_DESCRIPTION, rubricVersion: RUBRIC_VERSION, data: rows, page, limit, total });
   } catch (err) {
     next(err);
   }
@@ -42,11 +55,18 @@ const submitBody = z.object({
  * rewarded skill one level and record the submission as a project (evidence),
  * all in one transaction.
  */
-router.post("/", async (req, res, next) => {
+router.post("/", requireAuth, async (req, res, next) => {
   try {
     const parsed = submitBody.safeParse(req.body);
     if (!parsed.success) return sendInvalid(res, parsed.error);
-    const { assessmentId, studentProfileId, repoUrl, note, tasksDone, taskCount } = parsed.data;
+    // Attempts are personal: students submit as themselves; placement cannot
+    // submit on a student's behalf.
+    if (req.auth?.role !== "STUDENT") {
+      return res.status(403).json({ ok: false, error: "Only the student can submit attempts" });
+    }
+    const studentProfileId = resolveStudentScope(req, res, parsed.data.studentProfileId);
+    if (!studentProfileId) return;
+    const { assessmentId, repoUrl, note, tasksDone, taskCount } = parsed.data;
 
     const [assessment, profile] = await Promise.all([
       prisma.assessment.findUnique({ where: { id: assessmentId } }),
@@ -109,6 +129,7 @@ router.post("/", async (req, res, next) => {
     res.status(201).json({
       ok: true,
       rubric: RUBRIC_DESCRIPTION,
+      rubricVersion: RUBRIC_VERSION,
       data: result,
     });
   } catch (err) {

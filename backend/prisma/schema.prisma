@@ -65,13 +65,38 @@ model User {
   passwordHash String
   role         Role     @default(STUDENT)
   isActive     Boolean  @default(true)
+  /// Recruiter ↔ company association (null for non-recruiters). Placement
+  /// officers are STAFF; see docs/API-CONTRACT.md for the role mapping.
+  companyId    String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   studentProfile StudentProfile?
   assessments    Assessment[]    @relation("AssessmentAuthor")
+  company        Company?        @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  sessions       Session[]
 
   @@index([role])
+  @@index([companyId])
+}
+
+/// Revocable server-side sessions. Only SHA-256(token) is stored; the raw
+/// token exists solely in the HttpOnly cookie. Expired or revoked sessions
+/// never authorize requests.
+model Session {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  revokedAt DateTime?
+  userAgent String?
+  ip        String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model StudentProfile {
@@ -147,6 +172,7 @@ model Company {
   updatedAt DateTime @updatedAt
 
   jobs JobOpportunity[]
+  users User[]
 }
 
 model JobOpportunity {
@@ -157,6 +183,8 @@ model JobOpportunity {
   location    String?
   type        JobType   @default(FULL_TIME)
   status      JobStatus @default(OPEN)
+  /// Informational role seniority (e.g. Intern, Junior). Not used in matching.
+  seniority   String?
   salary      String?
   deadline    DateTime?
   /// Explicit hiring criteria: [{ "skill": "React", "minLevel": "INTERMEDIATE" }].

@@ -11,6 +11,7 @@ import {
   type SkillInput,
 } from "../lib/match.js";
 import { LEVEL, parsePaging, sendInvalid } from "../lib/validate.js";
+import { requireAuth, requireRole, resolveStudentScope } from "../lib/auth.js";
 
 const router = Router();
 
@@ -33,8 +34,8 @@ function parseRequirements(raw: unknown): Requirement[] {
   return out;
 }
 
-/** GET /api/students — paginated profiles with search/branch filters (placement views). */
-router.get("/", async (req, res, next) => {
+/** GET /api/students — placement-only directory (STAFF/ADMIN). No emails exposed. */
+router.get("/", requireAuth, requireRole("STAFF", "ADMIN"), async (req, res, next) => {
   try {
     const { page, limit } = parsePaging(req);
     const search = String(req.query.search ?? "").trim();
@@ -86,11 +87,13 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-/** GET /api/students/:id — full profile with skills + linked project evidence. */
-router.get("/:id", async (req, res, next) => {
+/** GET /api/students/:id — owner or placement only. Recruiters use job-scoped candidate views. */
+router.get("/:id", requireAuth, async (req, res, next) => {
   try {
+    const id = resolveStudentScope(req, res, req.params.id);
+    if (!id) return;
     const profile = await prisma.studentProfile.findUnique({
-      where: { id: req.params.id },
+      where: { id },
       include: {
         user: { select: { email: true, role: true } },
         skills: { include: { skill: true } },
@@ -140,11 +143,13 @@ const skillsBody = z.object({
  * PATCH /api/students/:id/skills — record or update claimed levels.
  * Levels are self-reported until linked project evidence exists; the Twin shows the difference.
  */
-router.patch("/:id/skills", async (req, res, next) => {
+router.patch("/:id/skills", requireAuth, async (req, res, next) => {
   try {
     const parsed = skillsBody.safeParse(req.body);
     if (!parsed.success) return sendInvalid(res, parsed.error);
-    const profile = await prisma.studentProfile.findUnique({ where: { id: req.params.id } });
+    const id = resolveStudentScope(req, res, req.params.id);
+    if (!id) return;
+    const profile = await prisma.studentProfile.findUnique({ where: { id } });
     if (!profile) return res.status(404).json({ ok: false, error: "Student profile not found" });
 
     const seen = new Set<string>();
@@ -184,12 +189,14 @@ const projectBody = z.object({
   skills: z.array(z.string().trim().min(1).max(60)).max(15).default([]),
 });
 
-/** POST /api/students/:id/projects — add a genuine evidence record. */
-router.post("/:id/projects", async (req, res, next) => {
+/** POST /api/students/:id/projects — owner or placement only. */
+router.post("/:id/projects", requireAuth, async (req, res, next) => {
   try {
     const parsed = projectBody.safeParse(req.body);
     if (!parsed.success) return sendInvalid(res, parsed.error);
-    const profile = await prisma.studentProfile.findUnique({ where: { id: req.params.id } });
+    const id = resolveStudentScope(req, res, req.params.id);
+    if (!id) return;
+    const profile = await prisma.studentProfile.findUnique({ where: { id } });
     if (!profile) return res.status(404).json({ ok: false, error: "Student profile not found" });
 
     const skillNames = [...new Set(parsed.data.skills.map((s) => s.trim()).filter(Boolean))];
@@ -245,26 +252,34 @@ async function loadSkillInputs(studentProfileId: string): Promise<SkillInput[]> 
 
 /**
  * GET /api/students/:id/matches — ranked opportunities with inspectable scoring.
- * Query: ?status=OPEN (default), ?limit=20
+ * Query: ?status=OPEN (default), ?limit=20, ?includeExpired=false.
+ * Past-deadline OPEN postings are treated as expired and excluded by default;
+ * they are never recommended as available. Tie-break is deterministic:
+ * score desc, deadline asc (nulls last), id asc.
  */
-router.get("/:id/matches", async (req, res, next) => {
+router.get("/:id/matches", requireAuth, async (req, res, next) => {
   try {
-    const profile = await prisma.studentProfile.findUnique({ where: { id: req.params.id } });
+    const id = resolveStudentScope(req, res, req.params.id);
+    if (!id) return;
+    const profile = await prisma.studentProfile.findUnique({ where: { id } });
     if (!profile) return res.status(404).json({ ok: false, error: "Student profile not found" });
     const status = String(req.query.status ?? "OPEN");
+    const includeExpired = String(req.query.includeExpired ?? "false").toLowerCase() === "true";
     const limit = Math.min(50, Math.max(1, Number.parseInt(String(req.query.limit ?? "20"), 10) || 20));
+    const now = new Date();
 
     const [skillInputs, jobs] = await Promise.all([
       loadSkillInputs(profile.id),
       prisma.jobOpportunity.findMany({
         where: status === "ALL" ? {} : { status: status as never },
         orderBy: { createdAt: "desc" },
-        take: limit * 2,
+        take: limit * 3,
         include: { company: true },
       }),
     ]);
 
     const ranked = jobs
+      .filter((job) => includeExpired || !job.deadline || job.deadline >= now)
       .map((job) => {
         const required = parseRequirements(job.requiredSkills);
         const result = matchRequirements(required, job.niceToHave, skillInputs);
@@ -276,6 +291,7 @@ router.get("/:id/matches", async (req, res, next) => {
             location: job.location,
             type: job.type,
             status: job.status,
+            seniority: job.seniority,
             salary: job.salary,
             deadline: job.deadline,
             description: job.description,
@@ -285,7 +301,13 @@ router.get("/:id/matches", async (req, res, next) => {
           ...result,
         };
       })
-      .sort((a, b) => b.score - a.score)
+      .sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        const da = a.job.deadline ? new Date(a.job.deadline).getTime() : Number.POSITIVE_INFINITY;
+        const db = b.job.deadline ? new Date(b.job.deadline).getTime() : Number.POSITIVE_INFINITY;
+        if (da !== db) return da - db;
+        return a.job.id < b.job.id ? -1 : a.job.id > b.job.id ? 1 : 0;
+      })
       .slice(0, limit);
 
     res.json({ ok: true, method: MATCH_METHOD, data: ranked });
@@ -294,10 +316,12 @@ router.get("/:id/matches", async (req, res, next) => {
   }
 });
 
-/** GET /api/students/:id/readiness — readiness derived from persisted inputs, with provenance. */
-router.get("/:id/readiness", async (req, res, next) => {
+/** GET /api/students/:id/readiness — owner or placement only. */
+router.get("/:id/readiness", requireAuth, async (req, res, next) => {
   try {
-    const profile = await prisma.studentProfile.findUnique({ where: { id: req.params.id } });
+    const id = resolveStudentScope(req, res, req.params.id);
+    if (!id) return;
+    const profile = await prisma.studentProfile.findUnique({ where: { id } });
     if (!profile) return res.status(404).json({ ok: false, error: "Student profile not found" });
     const [skillInputs, appCount, evaluated] = await Promise.all([
       loadSkillInputs(profile.id),
