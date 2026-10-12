@@ -56,7 +56,24 @@ cd frontend
 npm install
 npm run dev      # http://localhost:5173, talks to the API via VITE_API_BASE_URL
 npm run build    # typecheck + production build
+npm run lint     # oxlint
 ```
+
+### Routes
+
+| Route | What it is |
+| --- | --- |
+| `/` | Public landing page (`src/landing`). Renders **outside** `SessionProvider`, so it never waits on the API. |
+| `/app` | Student workspace overview (the dashboard that used to sit at `/`). |
+| `/twin`, `/mirror`, `/sprint`, `/applications`, `/arena`, `/passport`, `/tower` | Unchanged authenticated pages. |
+| anything else | Branded 404 (`src/landing/NotFound.tsx`). |
+
+The landing page is self-contained under `src/landing/`: `Landing.tsx` composes it,
+`landing.css` pulls in the focused modules under `src/landing/styles/` (tokens,
+base, header, hero, scene, journey, platform, closing), and `hooks/` holds the
+IntersectionObserver reveal plus the rAF-coalesced scroll-progress writer.
+Design tokens are added to the existing `@theme` block in `src/app.css`; nothing
+already used by the application is redefined.
 
 Student loop: Overview → Career Twin → Opportunity Mirror → Skill Sprint →
 submissions persist to PostgreSQL, grading follows the public rule-based rubric,

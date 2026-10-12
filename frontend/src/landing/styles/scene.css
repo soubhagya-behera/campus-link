@@ -1,0 +1,257 @@
+/* ============================================================================
+   CAMPUSLINK — The Ridgeline scene (hero signature visual)
+
+   Three nested <g> levels per band so three motions never fight over one
+   property:
+     .cl-sc-rise   entrance (translateY + opacity)
+     .cl-sc-layer  scroll-linked parallax (translateY)
+     .cl-sc-drift  ambient idle drift (translateX)
+
+   Only transform and opacity are ever animated, so the whole panel stays on
+   the compositor.
+   ========================================================================= */
+
+.cl-sc-sky {
+  opacity: 0;
+  animation: cl-fade-in 0.7s var(--cl-ease-out) 0ms backwards;
+}
+
+.cl-sc-rise {
+  animation: cl-sc-rise 0.95s var(--cl-ease-out) var(--rise-delay, 0ms) backwards;
+}
+@keyframes cl-sc-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.cl-sc-layer {
+  transform: translate3d(0, calc(var(--cl-scroll) * var(--depth, 0px)), 0);
+  transition: transform 140ms linear;
+}
+
+.cl-sc-drift {
+  animation: cl-sc-drift var(--dur, 26s) ease-in-out var(--drift-delay, 0s) infinite alternate;
+}
+@keyframes cl-sc-drift {
+  from {
+    transform: translate3d(calc(var(--amp, 14px) * -1), 0, 0);
+  }
+  to {
+    transform: translate3d(var(--amp, 14px), -5px, 0);
+  }
+}
+
+/* ───────────────────────────────────────────────────────────── mist bands ── */
+
+.cl-sc-mist {
+  animation: cl-sc-mist var(--mist-dur, 34s) ease-in-out infinite alternate;
+  mix-blend-mode: screen;
+}
+@keyframes cl-sc-mist {
+  from {
+    transform: translate3d(-34px, 0, 0);
+    opacity: 0.5;
+  }
+  to {
+    transform: translate3d(34px, 0, 0);
+    opacity: 0.78;
+  }
+}
+
+/* ────────────────────────────────────────────────────────── light & sun ── */
+
+.cl-sc-bloom {
+  animation:
+    cl-bloom-in 1.1s var(--cl-ease-out) var(--rise-delay, 1900ms) backwards,
+    cl-bloom-breathe 7.5s ease-in-out 3s infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes cl-bloom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+}
+/* Only opacity, so it hands over cleanly from the entrance above. */
+@keyframes cl-bloom-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.cl-sc-ray {
+  transform-box: fill-box;
+  transform-origin: 50% 8%;
+  animation: cl-ray-turn 74s linear infinite;
+}
+@keyframes cl-ray-turn {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(9deg);
+  }
+}
+
+.cl-sc-shimmer {
+  animation: cl-shimmer 9s ease-in-out infinite alternate;
+}
+@keyframes cl-shimmer {
+  from {
+    opacity: 0.3;
+  }
+  to {
+    opacity: 0.72;
+  }
+}
+
+/* ───────────────────────────────────────────────────── contours & terrain ── */
+
+.cl-sc-contour {
+  fill: none;
+  stroke: var(--cl-sage);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  animation: cl-draw 1.5s var(--cl-ease-out) var(--d, 0ms) forwards;
+}
+@keyframes cl-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ────────────────────────────────────────────────────────── signal path ── */
+
+/* A dark bed under the path so it holds its shape over every terrain value. */
+.cl-sc-path-bed {
+  fill: none;
+  stroke: rgb(8 26 18 / 0.55);
+  stroke-width: 11;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  animation: cl-draw 1.7s var(--cl-ease-out) 420ms forwards;
+}
+.cl-sc-path {
+  fill: none;
+  stroke: var(--cl-signal);
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+  animation: cl-draw 1.7s var(--cl-ease-out) 420ms forwards;
+  filter: drop-shadow(0 0 6px rgb(197 232 108 / 0.45));
+}
+/* One charge travelling the path, start to end, every 6s. */
+.cl-sc-charge {
+  fill: none;
+  stroke: #f4ffdb;
+  stroke-width: 5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 0.05 0.95;
+  stroke-dashoffset: 0;
+  opacity: 0;
+  animation: cl-charge 6s linear 2.4s infinite;
+}
+@keyframes cl-charge {
+  0% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+  }
+  78% {
+    opacity: 0.95;
+  }
+  100% {
+    stroke-dashoffset: -0.95;
+    opacity: 0;
+  }
+}
+
+/* ───────────────────────────────────────────────────────── station nodes ── */
+
+.cl-sc-node {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: cl-node-in 0.5s var(--cl-ease) var(--d) forwards;
+}
+@keyframes cl-node-in {
+  from {
+    opacity: 0;
+    transform: scale(0.15);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Staggered ring pulses: a wave that runs up the ridge. */
+.cl-sc-ping {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cl-ping 3.6s ease-out var(--d) infinite;
+}
+@keyframes cl-ping {
+  0% {
+    opacity: 0.85;
+    transform: scale(0.55);
+  }
+  60%,
+  100% {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+
+.cl-sc-summit {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: cl-node-in 0.7s var(--cl-ease) 2100ms forwards;
+}
+
+/* ────────────────────────────────────────────────── foreground grasses ── */
+
+.cl-sc-grass {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: cl-sway 7.5s ease-in-out infinite alternate;
+}
+.cl-sc-grass--b {
+  animation-duration: 9.5s;
+  animation-delay: -3s;
+}
+@keyframes cl-sway {
+  from {
+    transform: rotate(-1.1deg);
+  }
+  to {
+    transform: rotate(1.1deg);
+  }
+}
+
+/* ─────────────────────────────────────────── reduced-motion (in closing.css) */

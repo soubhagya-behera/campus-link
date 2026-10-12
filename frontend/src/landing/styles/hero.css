@@ -1,0 +1,265 @@
+/* ============================================================================
+   CAMPUSLINK — hero
+   Warm canvas, asymmetric: type on the left, a deep-forest landscape panel
+   on the right that bleeds to the viewport edge on wide screens.
+   ========================================================================= */
+
+.cl-hero {
+  position: relative;
+  z-index: 1;
+  padding-top: clamp(6.5rem, 11vh, 8.5rem);
+  padding-bottom: clamp(2.5rem, 4vw, 3.5rem);
+  overflow: clip;
+}
+
+/* A single warm wash behind the type, so the headline sits in light rather
+   than on a flat field. */
+.cl-hero-wash {
+  position: absolute;
+  z-index: 0;
+  top: -22%;
+  left: -14%;
+  width: 78%;
+  height: 128%;
+  pointer-events: none;
+  background:
+    radial-gradient(58% 46% at 30% 34%, rgb(197 232 108 / 0.22), transparent 68%),
+    radial-gradient(52% 40% at 8% 78%, rgb(132 149 129 / 0.2), transparent 70%);
+  animation: cl-wash 20s ease-in-out infinite alternate;
+}
+@keyframes cl-wash {
+  from {
+    opacity: 0.75;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(2%, 2%, 0) scale(1.06);
+  }
+}
+
+.cl-hero-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(2.5rem, 5vw, 4rem);
+}
+@media (min-width: 1000px) {
+  .cl-hero-grid {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: clamp(2.5rem, 4vw, 4.5rem);
+  }
+}
+
+.cl-hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  max-width: 37rem;
+}
+
+.cl-hero-title {
+  margin: 0;
+  font-size: clamp(2.5rem, 1.15rem + 4.9vw, 4.55rem);
+  line-height: 1.02;
+  letter-spacing: -0.036em;
+}
+.cl-hero-title em {
+  font-style: normal;
+  position: relative;
+  color: var(--cl-forest);
+  /* The rule is a background layer, never an overflowing child, so the masked
+     reveal cannot clip it. */
+  background-image: linear-gradient(var(--cl-signal), var(--cl-signal));
+  background-repeat: no-repeat;
+  background-position: 0 96%;
+  background-size: 0% 0.075em;
+  animation: cl-rule 0.9s var(--cl-ease-out) 0.95s forwards;
+}
+@keyframes cl-rule {
+  to {
+    background-size: 100% 0.075em;
+  }
+}
+
+.cl-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.75rem;
+}
+
+/* Three plain statements. No dots, no mono, no rules. */
+.cl-hero-proof {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.5rem;
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+}
+.cl-hero-proof li {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--cl-sage-deep);
+}
+
+/* ───────────────────────────────────────────── masked entrance (CSS-only) ── */
+
+.cl-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+}
+.cl-mask > span {
+  display: block;
+  transform: translate3d(0, 106%, 0);
+  animation: cl-mask-up 0.9s var(--cl-ease-out) forwards;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes cl-mask-up {
+  to {
+    transform: none;
+  }
+}
+
+.cl-fade-up {
+  opacity: 0;
+  animation: cl-fade 0.75s var(--cl-ease-out) forwards;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes cl-fade {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ───────────────────────────────────────────────────────── scene frame ── */
+
+.cl-scene {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 720 / 900;
+  max-height: 78vh;
+  border-radius: var(--cl-r-lg);
+  overflow: hidden;
+  box-shadow: var(--cl-shadow-lg);
+  background: var(--cl-forest);
+}
+
+.cl-scene-frame {
+  position: absolute;
+  inset: 0;
+}
+.cl-scene-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Station captions sit on the panel, legible against the forest. */
+.cl-scene-tag {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  background: rgb(12 32 24 / 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgb(245 244 238 / 0.14);
+  font-family: var(--cl-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgb(245 244 238 / 0.86);
+  white-space: nowrap;
+  opacity: 0;
+  animation: cl-tag-in 0.5s var(--cl-ease-out) forwards;
+  animation-delay: var(--d, 0ms);
+}
+.cl-scene-tag::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cl-signal);
+  flex-shrink: 0;
+}
+.cl-scene-tag--last {
+  border-color: rgb(197 232 108 / 0.5);
+  color: var(--cl-signal);
+}
+@keyframes cl-tag-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Corner meta: a survey stamp, reinforcing the scene's idea. */
+.cl-scene-meta {
+  position: absolute;
+  left: 1.1rem;
+  bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--cl-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(245 244 238 / 0.5);
+}
+.cl-scene-meta::before {
+  content: "";
+  width: 1.25rem;
+  height: 1px;
+  background: currentColor;
+}
+
+@media (max-width: 999px) {
+  /* A narrower plate rather than a cropped banner: the whole composition,
+     summit included, stays visible on portrait and tablet widths. */
+  .cl-scene {
+    width: min(100%, 30rem);
+    margin-inline: auto;
+    aspect-ratio: 720 / 900;
+    max-height: none;
+  }
+  /* The panel keeps its viewBox here, so captions stay on their stations. */
+  .cl-scene-meta {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .cl-hero {
+    padding-top: 5.75rem;
+  }
+  .cl-hero-copy {
+    max-width: none;
+    gap: 1.25rem;
+  }
+  .cl-scene {
+    width: min(100%, 26rem);
+    border-radius: var(--cl-r-md);
+  }
+  .cl-scene-tag {
+    font-size: 0.5625rem;
+    padding: 0.25rem 0.45rem;
+  }
+}

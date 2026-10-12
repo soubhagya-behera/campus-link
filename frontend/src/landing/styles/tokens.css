@@ -1,0 +1,76 @@
+/* ============================================================================
+   CAMPUSLINK — public landing design tokens (revision 02)
+   Scoped to the landing root (.cl) so the authenticated app is unaffected.
+
+   Direction: warm editorial canvas, deep-forest contrast bands, restrained
+   green identity, lime reserved for a handful of high-intent moments.
+   ========================================================================= */
+
+.cl {
+  /* ── Surfaces ───────────────────────────────────────────────────────── */
+  --cl-canvas: #f5f4ee; /* warm off-white: the main reading surface */
+  --cl-surface: #ffffff; /* clean surface for cards and figures */
+  --cl-forest: #173c2f; /* deep forest: contrast bands, headlines */
+  --cl-forest-2: #1f4c3b;
+  --cl-forest-3: #2a5c47;
+  --cl-ink: #202822;
+
+  /* ── Ink on light ───────────────────────────────────────────────────── */
+  --cl-text: #202822; /* 12.4:1 on canvas */
+  --cl-mute: #4f5c50; /*  6.6:1 on canvas — the only secondary text tone */
+  --cl-line: #dde2d8;
+  --cl-line-soft: #e9ece3;
+
+  /* ── Ink on forest ──────────────────────────────────────────────────── */
+  --cl-on-dark: #f5f4ee;
+  --cl-on-dark-mute: #b6c6b4; /* 7.2:1 on --cl-forest */
+  --cl-on-dark-line: rgb(245 244 238 / 0.16);
+  --cl-on-dark-line-soft: rgb(245 244 238 / 0.09);
+
+  /* ── Illustration ───────────────────────────────────────────────────── */
+  --cl-sage: #849581; /* graphics and hairlines only — 2.8:1, never text */
+  --cl-sage-deep: #5f7160;
+  --cl-sage-wash: #e9eee4;
+  --cl-sage-on-dark: #a9bba6; /* readable sage for text on the forest band */
+
+  /* ── Accent. Reserved for the primary CTA, the active rail, the signal
+        path and its station markers. Nothing else. ─────────────────────── */
+  --cl-signal: #c5e86c;
+  --cl-signal-ink: #3f5417;
+  --cl-signal-wash: rgb(197 232 108 / 0.16);
+  --cl-on-signal: #173c2f;
+
+  /* ── Spacing ────────────────────────────────────────────────────────── */
+  --cl-gutter: clamp(1.25rem, 4.5vw, 4.5rem);
+  --cl-max: 82rem;
+  --cl-section-y: clamp(4rem, 6.5vw, 7rem);
+  --cl-section-y-lg: clamp(4.5rem, 8vw, 9rem);
+
+  /* ── Radii — four values, used with intent ──────────────────────────── */
+  --cl-r-xs: 4px;
+  --cl-r-sm: 8px;
+  --cl-r-md: 14px;
+  --cl-r-lg: 22px;
+
+  /* ── Elevation: soft, warm, low-contrast. No neon glow. ──────────────── */
+  --cl-shadow-sm: 0 1px 2px rgb(32 40 34 / 0.04), 0 2px 8px -4px rgb(32 40 34 / 0.08);
+  --cl-shadow-md: 0 2px 4px rgb(32 40 34 / 0.04), 0 18px 40px -22px rgb(32 40 34 / 0.28);
+  --cl-shadow-lg: 0 4px 10px -4px rgb(32 40 34 / 0.06), 0 44px 80px -40px rgb(32 40 34 / 0.4);
+  --cl-shadow-signal: 0 10px 26px -12px rgb(63 84 23 / 0.5);
+
+  /* ── Motion ─────────────────────────────────────────────────────────── */
+  --cl-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --cl-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --cl-t-fast: 160ms;
+  --cl-t-mid: 300ms;
+  --cl-t-slow: 760ms;
+
+  /* ── Typography ─────────────────────────────────────────────────────── */
+  --cl-display: var(--font-syne);
+  --cl-ui: var(--font-manrope);
+  --cl-mono: var(--font-plex);
+
+  /* ── Scroll-driven values, written by useScrollProgress() ───────────── */
+  --cl-scroll: 0;
+  --cl-journey: 0;
+}

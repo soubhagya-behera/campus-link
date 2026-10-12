@@ -1,0 +1,368 @@
+/* ============================================================================
+   CAMPUSLINK — evidence, recruiters, closing CTA, footer, reduced motion
+   ========================================================================= */
+
+/* ────────────────────────────────────────────── progress and evidence ──── */
+
+.cl-proof {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: center;
+}
+@media (min-width: 960px) {
+  .cl-proof {
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: clamp(2.5rem, 5vw, 4.5rem);
+  }
+}
+.cl-proof-copy {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+.cl-proof-copy p {
+  margin: 0;
+}
+
+/* One claim, followed to its consequence. */
+.cl-trace {
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: trace;
+}
+.cl-trace li {
+  position: relative;
+  padding: 0 0 1.5rem 2.25rem;
+  counter-increment: trace;
+}
+.cl-trace li:last-child {
+  padding-bottom: 0;
+}
+.cl-trace li::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 1.6rem;
+  bottom: 0.15rem;
+  width: 1.5px;
+  background: var(--cl-line);
+}
+.cl-trace li:last-child::before {
+  display: none;
+}
+.cl-trace li::after {
+  content: counter(trace, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0.15rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--cl-surface);
+  border: 1px solid var(--cl-line);
+  font-family: var(--cl-mono);
+  font-size: 0.5625rem;
+  color: var(--cl-sage-deep);
+}
+.cl-trace li:last-child::after {
+  background: var(--cl-signal);
+  border-color: var(--cl-signal);
+  color: var(--cl-on-signal);
+}
+.cl-trace b {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--cl-forest);
+}
+.cl-trace p {
+  margin: 0.2rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--cl-mute);
+  max-width: 40ch;
+}
+
+/* Illustrative record panel. */
+.cl-record {
+  border: 1px solid var(--cl-line);
+  border-radius: var(--cl-r-md);
+  background: var(--cl-surface);
+  box-shadow: var(--cl-shadow-md);
+  overflow: hidden;
+}
+.cl-record-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 0.75rem clamp(0.9rem, 2vw, 1.15rem);
+  border-bottom: 1px solid var(--cl-line-soft);
+  background: var(--cl-canvas);
+}
+.cl-record-bar p {
+  margin: 0 0 0 auto;
+  font-family: var(--cl-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cl-sage-deep);
+}
+.cl-record-row {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.85rem clamp(0.9rem, 2vw, 1.15rem);
+  border-bottom: 1px solid var(--cl-line-soft);
+}
+.cl-record-row:last-of-type {
+  border-bottom: 0;
+}
+.cl-record-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.6rem;
+}
+.cl-record-skill {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--cl-forest);
+}
+.cl-record-note {
+  font-size: 0.8125rem;
+  color: var(--cl-mute);
+}
+.cl-record-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  padding: 0.8rem clamp(0.9rem, 2vw, 1.15rem);
+  border-top: 1px solid var(--cl-line-soft);
+  background: var(--cl-canvas);
+  font-family: var(--cl-mono);
+  font-size: 0.6875rem;
+  color: var(--cl-sage-deep);
+}
+.cl-record-foot b {
+  font-weight: 500;
+  color: var(--cl-signal-ink);
+}
+
+/* ─────────────────────────────────────────────── recruiters (sage tint) ── */
+
+.cl-placement {
+  display: grid;
+  gap: clamp(1.75rem, 3.5vw, 3rem);
+  align-items: center;
+}
+@media (min-width: 900px) {
+  .cl-placement {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+    gap: clamp(2.5rem, 5vw, 4.5rem);
+  }
+}
+.cl-placement-copy {
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
+}
+.cl-placement-copy p {
+  margin: 0;
+}
+.cl-placement-board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  padding: clamp(1.1rem, 2.2vw, 1.5rem);
+  border: 1px solid var(--cl-line);
+  border-radius: var(--cl-r-md);
+  background: var(--cl-surface);
+  box-shadow: var(--cl-shadow-sm);
+}
+.cl-placement-cell {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.85rem;
+  border-radius: var(--cl-r-xs);
+  background: var(--cl-sage-wash);
+}
+.cl-placement-cell b {
+  font-family: var(--cl-display);
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--cl-sage);
+}
+.cl-placement-cell span {
+  font-size: 0.75rem;
+  color: var(--cl-sage-deep);
+}
+
+/* ────────────────────────────────────────────────── final CTA (forest) ── */
+
+.cl-cta {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(2.25rem, 5vw, 4.25rem);
+  border-radius: var(--cl-r-lg);
+  background: var(--cl-forest);
+  color: var(--cl-on-dark);
+}
+.cl-cta-in {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: clamp(1.75rem, 3vw, 2.75rem);
+  align-items: end;
+}
+@media (min-width: 880px) {
+  .cl-cta-in {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+}
+.cl-cta h2 {
+  margin: 0.9rem 0 0;
+  color: var(--cl-on-dark);
+}
+.cl-cta .cl-lede {
+  color: var(--cl-on-dark-mute);
+}
+.cl-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.875rem 1.75rem;
+}
+
+/* The ridge motif returns, flattened into a horizon under the panel. */
+.cl-cta-horizon {
+  position: absolute;
+  right: -4%;
+  bottom: -2%;
+  left: -4%;
+  z-index: 0;
+  height: 58%;
+  color: var(--cl-sage);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ───────────────────────────────────────────────────────────── footer ──── */
+
+.cl-foot {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--cl-line);
+  padding-block: clamp(2.5rem, 4.5vw, 3.5rem) 2rem;
+  background: var(--cl-canvas);
+}
+.cl-foot-grid {
+  display: grid;
+  gap: clamp(1.75rem, 4vw, 2.5rem);
+}
+@media (min-width: 720px) {
+  .cl-foot-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1000px) {
+  .cl-foot-grid {
+    grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+  }
+}
+.cl-foot h2 {
+  margin: 0 0 0.85rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--cl-forest);
+}
+.cl-foot ul {
+  display: grid;
+  gap: 0.55rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cl-foot a {
+  font-size: 0.875rem;
+  color: var(--cl-mute);
+  text-decoration: none;
+  transition: color var(--cl-t-fast) linear;
+}
+.cl-foot a:hover {
+  color: var(--cl-signal-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cl-foot-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  justify-content: space-between;
+  margin-top: clamp(2rem, 4vw, 2.75rem);
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--cl-line-soft);
+  font-size: 0.8125rem;
+  color: var(--cl-sage-deep);
+}
+
+/* ────────────────────────────────────────────────────── reduced motion ─── */
+
+@media (prefers-reduced-motion: reduce) {
+  .cl *,
+  .cl *::before,
+  .cl *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Every animated element lands on its final resting state. */
+  .cl-mask > span,
+  .cl-fade-up,
+  .cl-scene-tag,
+  .cl-sc-sky,
+  .cl-sc-rise,
+  .cl-sc-contour,
+  .cl-sc-path,
+  .cl-sc-path-bed,
+  .cl-sc-node,
+  .cl-sc-summit,
+  .cl-sc-bloom,
+  .cl-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+  .cl-sc-layer {
+    transform: none !important;
+  }
+  .cl-hero-title em {
+    background-size: 100% 0.075em !important;
+  }
+  .cl-sc-charge,
+  .cl-sc-ping,
+  .cl-sc-ray,
+  .cl-sc-grass,
+  .cl-sc-mist,
+  .cl-sc-shimmer,
+  .cl-hero-wash {
+    animation: none !important;
+  }
+  .cl-sc-charge {
+    opacity: 0 !important;
+  }
+  .cl-stop-rail::before,
+  .cl-pathway-bead {
+    transform: none !important;
+  }
+  .cl-stop-rail::before {
+    transform: scaleX(1) !important;
+  }
+}

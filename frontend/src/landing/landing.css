@@ -1,0 +1,15 @@
+/* ============================================================================
+   CAMPUSLINK — public landing page stylesheet (revision 02)
+   Imported only by src/landing/Landing.tsx, so the authenticated application
+   (src/pages, src/components, src/app.css) is not affected. Colour and font
+   tokens live in the shared @theme block in src/app.css.
+   ========================================================================= */
+
+@import "./styles/tokens.css";
+@import "./styles/base.css";
+@import "./styles/header.css";
+@import "./styles/hero.css";
+@import "./styles/scene.css";
+@import "./styles/journey.css";
+@import "./styles/platform.css";
+@import "./styles/closing.css";

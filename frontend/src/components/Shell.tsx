@@ -24,7 +24,7 @@ interface NavItem {
 }
 
 const STUDENT_NAV: NavItem[] = [
-  { to: "/", label: "Overview", icon: LayoutDashboard, end: true },
+  { to: "/app", label: "Overview", icon: LayoutDashboard, end: true },
   { to: "/twin", label: "Career Twin", icon: Fingerprint },
   { to: "/mirror", label: "Opportunity Mirror", icon: Radar },
   { to: "/sprint", label: "Skill Sprint", icon: Dumbbell },

@@ -1,0 +1,334 @@
+/* ============================================================================
+   CAMPUSLINK — landing base: layout, typography, controls, reveal system
+   Light-first. `.cl-band--dark` flips a section to the forest identity.
+   ========================================================================= */
+
+.cl {
+  position: relative;
+  min-height: 100%;
+  overflow-x: clip;
+  background: var(--cl-canvas);
+  color: var(--cl-text);
+  font-family: var(--cl-ui);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.cl ::selection {
+  background: var(--cl-signal);
+  color: var(--cl-on-signal);
+}
+
+.cl :focus-visible {
+  outline: 2px solid var(--cl-signal-ink);
+  outline-offset: 3px;
+  border-radius: var(--cl-r-xs);
+}
+
+.cl-band--dark :focus-visible,
+.cl-scene :focus-visible {
+  outline-color: var(--cl-signal);
+}
+
+/* ─────────────────────────────────────────────────────────────── layout ── */
+
+.cl-shell {
+  width: 100%;
+  max-width: var(--cl-max);
+  margin-inline: auto;
+  padding-inline: var(--cl-gutter);
+}
+
+.cl-section {
+  position: relative;
+  z-index: 1;
+  padding-block: var(--cl-section-y);
+  scroll-margin-top: 5.5rem;
+}
+
+.cl-section--tight {
+  padding-block: clamp(3rem, 5vw, 5rem);
+}
+
+.cl-band--dark {
+  background: var(--cl-forest);
+  color: var(--cl-on-dark);
+}
+.cl-band--dark .cl-h1,
+.cl-band--dark .cl-h2,
+.cl-band--dark .cl-h3 {
+  color: var(--cl-on-dark);
+}
+.cl-band--dark .cl-lede,
+.cl-band--dark .cl-body {
+  color: var(--cl-on-dark-mute);
+}
+.cl-band--dark .cl-eyebrow {
+  color: var(--cl-sage-on-dark);
+}
+.cl-band--dark .cl-tag {
+  border-color: var(--cl-on-dark-line);
+  color: var(--cl-on-dark-mute);
+}
+.cl-band--dark .cl-tag--signal {
+  border-color: rgb(197 232 108 / 0.4);
+  background: rgb(197 232 108 / 0.12);
+  color: var(--cl-signal);
+}
+
+/* Full-bleed wrapper for banded sections. */
+.cl-band {
+  position: relative;
+  z-index: 1;
+}
+.cl-band > .cl-shell {
+  padding-block: var(--cl-section-y-lg);
+}
+
+.cl-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cl-skip {
+  position: absolute;
+  left: var(--cl-gutter);
+  top: 0.75rem;
+  z-index: 90;
+  padding: 0.7rem 1.1rem;
+  background: var(--cl-forest);
+  color: var(--cl-on-dark);
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: var(--cl-r-sm);
+  transform: translateY(-180%);
+  transition: transform var(--cl-t-mid) var(--cl-ease);
+}
+.cl-skip:focus-visible {
+  transform: translateY(0);
+  outline-color: var(--cl-signal);
+}
+
+/* ────────────────────────────────────────────────────────── typography ── */
+
+.cl-h1 {
+  font-family: var(--cl-display);
+  font-weight: 700;
+  font-size: clamp(2.6rem, 1.1rem + 6vw, 5.25rem);
+  line-height: 0.98;
+  letter-spacing: -0.038em;
+  color: var(--cl-forest);
+  text-wrap: balance;
+}
+
+.cl-h2 {
+  font-family: var(--cl-display);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 1.25rem + 2.7vw, 3.15rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  color: var(--cl-forest);
+  text-wrap: balance;
+}
+
+.cl-h3 {
+  font-family: var(--cl-display);
+  font-weight: 600;
+  font-size: clamp(1.2rem, 1.06rem + 0.6vw, 1.5rem);
+  line-height: 1.2;
+  letter-spacing: -0.016em;
+  color: var(--cl-forest);
+  text-wrap: balance;
+}
+
+.cl-lede {
+  font-size: clamp(1.0625rem, 1rem + 0.38vw, 1.25rem);
+  line-height: 1.58;
+  color: var(--cl-mute);
+  max-width: 40ch;
+  text-wrap: pretty;
+}
+
+.cl-body {
+  font-size: 1rem;
+  line-height: 1.62;
+  color: var(--cl-mute);
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+
+.cl-note {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--cl-sage-deep);
+}
+
+/* The one technical label style. Never used for explanatory copy. */
+.cl-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--cl-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cl-sage-deep);
+}
+
+.cl-tag {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--cl-line);
+  border-radius: var(--cl-r-xs);
+  font-family: var(--cl-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cl-sage-deep);
+  white-space: nowrap;
+}
+.cl-tag--signal {
+  border-color: rgb(197 232 108 / 0.6);
+  background: var(--cl-signal-wash);
+  color: var(--cl-signal-ink);
+}
+
+/* ────────────────────────────────────────────────────────────── buttons ── */
+
+.cl-btn {
+  --btn-bg: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0.75rem 1.35rem;
+  border: 1px solid transparent;
+  border-radius: var(--cl-r-sm);
+  background: var(--btn-bg);
+  font-family: var(--cl-ui);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.008em;
+  color: var(--cl-forest);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--cl-t-fast) linear,
+    border-color var(--cl-t-fast) linear,
+    color var(--cl-t-fast) linear,
+    box-shadow var(--cl-t-mid) var(--cl-ease),
+    transform var(--cl-t-fast) var(--cl-ease);
+}
+
+.cl-btn--primary {
+  --btn-bg: var(--cl-signal);
+  border-color: var(--cl-signal);
+  color: var(--cl-on-signal);
+  box-shadow: var(--cl-shadow-signal);
+}
+.cl-btn--primary:hover {
+  --btn-bg: #d3f281;
+  border-color: #d3f281;
+  box-shadow: 0 14px 30px -12px rgb(63 84 23 / 0.62);
+}
+.cl-btn--primary:active {
+  transform: translateY(1px);
+}
+
+.cl-btn--quiet {
+  border-color: var(--cl-line);
+  background: var(--cl-surface);
+  color: var(--cl-forest);
+}
+.cl-btn--quiet:hover {
+  border-color: var(--cl-sage);
+  background: var(--cl-canvas);
+}
+
+.cl-btn--dark {
+  border-color: var(--cl-on-dark-line);
+  color: var(--cl-on-dark);
+}
+.cl-btn--dark:hover {
+  border-color: var(--cl-sage);
+  background: rgb(245 244 238 / 0.06);
+}
+
+.cl-btn--lg {
+  min-height: 3.375rem;
+  padding: 0.9rem 1.6rem;
+  font-size: 1rem;
+}
+
+.cl-arrow {
+  flex-shrink: 0;
+  transition: transform var(--cl-t-mid) var(--cl-ease);
+}
+.cl-btn:hover .cl-arrow,
+.cl-link:hover .cl-arrow {
+  transform: translateX(4px);
+}
+
+/* Secondary action: an underline that draws in. Not a pill. */
+.cl-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding-block: 0.2rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--cl-forest);
+  text-decoration: none;
+  background-image: linear-gradient(var(--cl-sage), var(--cl-sage));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1.5px;
+  transition:
+    background-size var(--cl-t-mid) var(--cl-ease),
+    color var(--cl-t-fast) linear;
+}
+.cl-link:hover {
+  background-size: 100% 1.5px;
+  color: var(--cl-signal-ink);
+}
+.cl-band--dark .cl-link {
+  color: var(--cl-on-dark);
+  background-image: linear-gradient(var(--cl-signal), var(--cl-signal));
+}
+.cl-band--dark .cl-link:hover {
+  color: var(--cl-signal);
+}
+
+/* ─────────────────────────────────────────────── scroll reveal (no JS) ── */
+
+.cl-reveal {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  transition:
+    opacity var(--cl-t-slow) var(--cl-ease-out),
+    transform var(--cl-t-slow) var(--cl-ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.cl-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.cl-no-js .cl-reveal {
+  opacity: 1;
+  transform: none;
+}

@@ -1,0 +1,246 @@
+/* ============================================================================
+   CAMPUSLINK — landing header
+   Sits on the warm canvas, gains a hairline rule and blur once scrolled.
+   ========================================================================= */
+
+.cl-head {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 60;
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color var(--cl-t-mid) linear,
+    border-color var(--cl-t-mid) linear,
+    box-shadow var(--cl-t-mid) linear;
+}
+.cl-head.is-stuck {
+  background: rgb(245 244 238 / 0.88);
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  border-bottom-color: var(--cl-line);
+}
+
+.cl-head-in {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2.75rem);
+  height: 4.75rem;
+  transition: height var(--cl-t-mid) var(--cl-ease);
+}
+.cl-head.is-stuck .cl-head-in {
+  height: 3.75rem;
+}
+
+/* ───────────────────────────────────────────────────────────── wordmark ── */
+
+.cl-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--cl-forest);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.cl-mark-glyph {
+  width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+  color: var(--cl-signal-ink);
+  transition: transform var(--cl-t-slow) var(--cl-ease);
+}
+.cl-mark:hover .cl-mark-glyph {
+  transform: translateY(-2px);
+}
+.cl-mark-word {
+  display: block;
+  font-family: var(--cl-display);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.015em;
+  line-height: 1.1;
+}
+.cl-mark-sub {
+  display: block;
+  font-family: var(--cl-mono);
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cl-sage-deep);
+  margin-top: 0.12rem;
+}
+
+/* ───────────────────────────────────────────────────────────────── nav ── */
+
+.cl-nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2vw, 1.9rem);
+  margin-left: auto;
+}
+
+.cl-nav-link {
+  position: relative;
+  padding: 0.4rem 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--cl-mute);
+  text-decoration: none;
+  transition: color var(--cl-t-fast) linear;
+}
+.cl-nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  border-radius: 2px;
+  background: var(--cl-signal-ink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--cl-t-mid) var(--cl-ease);
+}
+.cl-nav-link:hover {
+  color: var(--cl-forest);
+}
+.cl-nav-link:hover::after,
+.cl-nav-link[aria-current="true"]::after {
+  transform: scaleX(1);
+}
+.cl-nav-link[aria-current="true"] {
+  color: var(--cl-forest);
+}
+
+.cl-head-cta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* ─────────────────────────────────────────────────────── mobile drawer ── */
+
+.cl-burger {
+  display: none;
+  width: 2.875rem;
+  height: 2.875rem;
+  margin-left: auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--cl-line);
+  border-radius: var(--cl-r-sm);
+  background: var(--cl-surface);
+  color: var(--cl-forest);
+  cursor: pointer;
+  transition:
+    border-color var(--cl-t-fast) linear,
+    background-color var(--cl-t-fast) linear;
+}
+.cl-burger:hover {
+  border-color: var(--cl-sage);
+}
+.cl-burger-bars {
+  display: block;
+  position: relative;
+  width: 17px;
+  height: 1.75px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: background-color var(--cl-t-fast) linear;
+}
+.cl-burger-bars::before,
+.cl-burger-bars::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 17px;
+  height: 1.75px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform var(--cl-t-mid) var(--cl-ease);
+}
+.cl-burger-bars::before {
+  top: -5.5px;
+}
+.cl-burger-bars::after {
+  top: 5.5px;
+}
+.cl-burger[aria-expanded="true"] .cl-burger-bars {
+  background: transparent;
+}
+.cl-burger[aria-expanded="true"] .cl-burger-bars::before {
+  transform: translateY(5.5px) rotate(45deg);
+}
+.cl-burger[aria-expanded="true"] .cl-burger-bars::after {
+  transform: translateY(-5.5px) rotate(-45deg);
+}
+
+.cl-drawer {
+  position: fixed;
+  inset: 4.75rem 0 auto;
+  z-index: 59;
+  padding: 0.5rem var(--cl-gutter) 1.75rem;
+  background: rgb(245 244 238 / 0.98);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--cl-line);
+  box-shadow: var(--cl-shadow-md);
+  transform: translateY(-10px);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--cl-t-mid) var(--cl-ease),
+    transform var(--cl-t-mid) var(--cl-ease),
+    visibility 0s linear var(--cl-t-mid);
+}
+.cl-drawer.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+.cl-drawer nav a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.95rem 0;
+  border-bottom: 1px solid var(--cl-line-soft);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--cl-forest);
+  text-decoration: none;
+}
+.cl-drawer nav a::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-top: 1.5px solid var(--cl-sage);
+  border-right: 1.5px solid var(--cl-sage);
+  transform: rotate(45deg);
+}
+.cl-drawer-cta {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+
+/* ───────────────────────────────────────────────────────── breakpoints ── */
+
+@media (max-width: 1000px) {
+  .cl-nav,
+  .cl-head-cta .cl-link {
+    display: none;
+  }
+  .cl-burger {
+    display: flex;
+  }
+}
+
+@media (max-width: 560px) {
+  .cl-head-cta .cl-btn {
+    display: none;
+  }
+  .cl-mark-sub {
+    display: none;
+  }
+}

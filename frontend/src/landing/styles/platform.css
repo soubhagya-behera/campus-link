@@ -1,0 +1,392 @@
+/* ============================================================================
+   CAMPUSLINK — platform section
+   Three deliberately different layouts so the page never reads as a grid of
+   identical feature cards:
+     1. Spotlight  — one wide feature, full-bleed figure to the right
+     2. Trio       — asymmetric three-up with real product-shaped figures
+     3. Pair       — two stacked editorial rows sharing a wide figure
+   ========================================================================= */
+
+.cl-platform-head {
+  display: grid;
+  gap: 1.25rem;
+  margin-bottom: clamp(2.25rem, 4vw, 3.5rem);
+}
+@media (min-width: 900px) {
+  .cl-platform-head {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    align-items: end;
+    gap: 1.5rem clamp(2rem, 5vw, 4rem);
+  }
+  .cl-platform-head .cl-lede {
+    justify-self: end;
+  }
+}
+
+/* ─────────────────────────────────────────────── 1 · spotlight (Twin) ── */
+
+.cl-spotlight {
+  display: grid;
+  gap: clamp(1.75rem, 3.5vw, 3rem);
+  align-items: center;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border: 1px solid var(--cl-line);
+  border-radius: var(--cl-r-lg);
+  background: var(--cl-surface);
+  box-shadow: var(--cl-shadow-md);
+}
+@media (min-width: 940px) {
+  .cl-spotlight {
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  }
+}
+.cl-spotlight-copy {
+  display: grid;
+  gap: 0.85rem;
+  align-content: start;
+}
+.cl-spotlight-copy p {
+  margin: 0;
+}
+
+/* The claim / evidence mirror, drawn as a product-shaped figure. */
+.cl-mirror {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  padding: clamp(1rem, 2vw, 1.4rem);
+  border: 1px solid var(--cl-line-soft);
+  border-radius: var(--cl-r-md);
+  background: var(--cl-canvas);
+}
+.cl-mirror-col {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+}
+.cl-mirror-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.15rem;
+  font-family: var(--cl-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cl-sage-deep);
+}
+.cl-mirror-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--cl-line);
+}
+.cl-mirror-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+  border-radius: var(--cl-r-xs);
+  background: var(--cl-surface);
+  font-size: 0.8125rem;
+  color: var(--cl-mute);
+  border: 1px solid var(--cl-line-soft);
+}
+.cl-mirror-row i {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--cl-sage);
+}
+.cl-mirror-row b {
+  margin-left: auto;
+  font-family: var(--cl-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--cl-sage-deep);
+}
+.cl-mirror-row--proven {
+  border-color: rgb(197 232 108 / 0.65);
+  background: rgb(197 232 108 / 0.12);
+  color: var(--cl-forest);
+}
+.cl-mirror-row--proven i {
+  border-color: var(--cl-signal-ink);
+  background: var(--cl-signal);
+}
+.cl-mirror-row--proven b {
+  color: var(--cl-signal-ink);
+}
+.cl-mirror-seam {
+  width: 1px;
+  background: linear-gradient(transparent, var(--cl-sage), transparent);
+}
+
+/* ───────────────────────────────────────────────── 2 · asymmetric trio ── */
+
+.cl-trio {
+  display: grid;
+  gap: clamp(1rem, 1.8vw, 1.5rem);
+  margin-top: clamp(1rem, 1.8vw, 1.5rem);
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 760px) {
+  .cl-trio {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .cl-trio > :nth-child(1) {
+    grid-column: span 3;
+  }
+  .cl-trio > :nth-child(2) {
+    grid-column: span 2;
+  }
+  .cl-trio > :nth-child(3) {
+    grid-column: span 1;
+  }
+}
+@media (min-width: 1100px) {
+  .cl-trio > :nth-child(1) {
+    grid-column: span 2;
+  }
+  .cl-trio > :nth-child(2) {
+    grid-column: span 2;
+  }
+  .cl-trio > :nth-child(3) {
+    grid-column: span 2;
+  }
+}
+
+.cl-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: clamp(1.35rem, 2.2vw, 1.75rem);
+  border: 1px solid var(--cl-line);
+  border-radius: var(--cl-r-md);
+  background: var(--cl-surface);
+  box-shadow: var(--cl-shadow-sm);
+}
+.cl-card h3 {
+  margin: 0;
+}
+.cl-card p {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.58;
+  color: var(--cl-mute);
+}
+.cl-card-figure {
+  margin-top: auto;
+  padding-top: 1.1rem;
+}
+.cl-card-figure--tint {
+  margin: 0 -0.35rem -0.35rem;
+  padding: clamp(0.9rem, 1.8vw, 1.25rem);
+  border-radius: var(--cl-r-sm);
+  background: var(--cl-sage-wash);
+}
+
+/* Ranked match bars (Opportunity Mirror). */
+.cl-rank {
+  display: grid;
+  gap: 0.7rem;
+}
+.cl-rank-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.3rem 0.6rem;
+  align-items: baseline;
+}
+.cl-rank-name {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--cl-forest);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cl-rank-score {
+  font-family: var(--cl-mono);
+  font-size: 0.6875rem;
+  color: var(--cl-sage-deep);
+}
+.cl-rank-track {
+  grid-column: 1 / -1;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--cl-sage-wash);
+  overflow: hidden;
+}
+.cl-rank-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--cl-sage);
+}
+.cl-rank-row--top .cl-rank-fill {
+  background: var(--cl-signal);
+}
+.cl-rank-row--top .cl-rank-score {
+  color: var(--cl-signal-ink);
+}
+.cl-rank-gaps {
+  margin: 0.15rem 0 0;
+  font-family: var(--cl-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  color: var(--cl-sage-deep);
+}
+
+/* Rubric ladder (Skill Sprint). */
+.cl-ladder {
+  display: grid;
+  gap: 0.45rem;
+}
+.cl-ladder-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--cl-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  color: var(--cl-sage-deep);
+}
+.cl-ladder-label {
+  width: 6.5rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cl-ladder-track {
+  flex: 1;
+  height: 7px;
+  border-radius: 4px;
+  background: rgb(132 149 129 / 0.22);
+  overflow: hidden;
+}
+.cl-ladder-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--cl-sage-deep);
+}
+.cl-ladder-row--top .cl-ladder-fill {
+  background: var(--cl-signal);
+}
+.cl-ladder-row--top {
+  color: var(--cl-signal-ink);
+}
+
+/* Passport sheet (Career Passport). */
+.cl-passport {
+  display: grid;
+  gap: 0.45rem;
+}
+.cl-passport-stamp {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px dashed var(--cl-sage);
+  border-radius: var(--cl-r-xs);
+  background: var(--cl-surface);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--cl-forest);
+}
+.cl-passport-stamp span {
+  font-family: var(--cl-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.1em;
+  color: var(--cl-sage-deep);
+  white-space: nowrap;
+}
+
+/* ────────────────────────────────────────── 3 · editorial pair rows ── */
+
+.cl-pair {
+  display: grid;
+  gap: clamp(1rem, 1.8vw, 1.5rem);
+  margin-top: clamp(1rem, 1.8vw, 1.5rem);
+}
+@media (min-width: 900px) {
+  .cl-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.cl-pair .cl-card {
+  gap: 1rem;
+}
+@media (min-width: 560px) {
+  .cl-pair .cl-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 13.5rem;
+    gap: 1rem 1.5rem;
+    align-items: center;
+  }
+  .cl-pair .cl-card-figure {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Applications pipeline. */
+.cl-pipeline {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.cl-pipeline-col {
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+  padding: 0.5rem;
+  border-radius: var(--cl-r-xs);
+  background: var(--cl-sage-wash);
+}
+.cl-pipeline-label {
+  font-family: var(--cl-mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cl-sage-deep);
+}
+.cl-pipeline-tile {
+  height: 11px;
+  border-radius: 3px;
+  background: rgb(95 113 96 / 0.25);
+}
+.cl-pipeline-tile--live {
+  background: var(--cl-signal);
+}
+
+/* Interview practice exchange. */
+.cl-arena {
+  display: grid;
+  gap: 0.4rem;
+}
+.cl-arena-row {
+  display: flex;
+}
+.cl-arena-row--you {
+  justify-content: flex-end;
+}
+.cl-arena-bubble {
+  max-width: 88%;
+  margin: 0;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--cl-r-xs);
+  font-size: 0.6875rem;
+  line-height: 1.42;
+  color: var(--cl-mute);
+  background: var(--cl-sage-wash);
+}
+.cl-arena-row--you .cl-arena-bubble {
+  background: var(--cl-forest);
+  color: var(--cl-on-dark);
+}

@@ -1,0 +1,215 @@
+/* ============================================================================
+   CAMPUSLINK — product journey (full-bleed forest band)
+
+   One continuous horizontal pathway through four stations. The rail's lime
+   fill and the travelling bead are driven by --cl-journey, written by a single
+   rAF-coalesced scroll listener. On narrow screens the same pathway becomes
+   vertical, with one connector per step.
+   ========================================================================= */
+
+.cl-journey {
+  position: relative;
+  z-index: 1;
+  scroll-margin-top: 5.5rem;
+}
+
+/* A faint survey grid, masked to a soft oval: texture without a flat fill. */
+.cl-journey::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(245 244 238 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(245 244 238 / 0.05) 1px, transparent 1px);
+  background-size: 76px 76px;
+  mask-image: radial-gradient(115% 85% at 50% 42%, #000 22%, transparent 76%);
+  -webkit-mask-image: radial-gradient(115% 85% at 50% 42%, #000 22%, transparent 76%);
+}
+
+.cl-journey-head {
+  display: grid;
+  gap: 0.9rem;
+  margin-bottom: clamp(2.5rem, 4.5vw, 4rem);
+  max-width: 42rem;
+}
+.cl-journey-head .cl-lede {
+  color: var(--cl-on-dark-mute);
+}
+
+/* ───────────────────────────────────────────────── desktop: one long rail ── */
+
+.cl-pathway-wrap {
+  position: relative;
+  /* Shared by the grid gap and the rail inset, so the rail's ends land exactly
+     on the first and last station dots. */
+  --cl-way-gap: clamp(1.25rem, 2.5vw, 2.25rem);
+}
+
+.cl-pathway-rail {
+  display: none;
+}
+@media (min-width: 880px) {
+  .cl-pathway-rail {
+    display: block;
+    position: absolute;
+    /* Half of one column, where the first and last dots sit. */
+    left: calc((100% - 3 * var(--cl-way-gap)) / 8);
+    right: calc((100% - 3 * var(--cl-way-gap)) / 8);
+    top: 11px;
+    height: 3px;
+    border-radius: 3px;
+    background: rgb(245 244 238 / 0.18);
+  }
+}
+
+.cl-pathway-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--cl-signal), rgb(197 232 108 / 0.45));
+  transform: scaleX(var(--cl-journey, 0));
+  transform-origin: left;
+  box-shadow: 0 0 16px rgb(197 232 108 / 0.35);
+}
+
+.cl-pathway-bead {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--cl-journey, 0) * 100%);
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border-radius: 50%;
+  background: var(--cl-signal);
+  box-shadow: 0 0 0 4px rgb(197 232 108 / 0.18), 0 0 18px rgb(197 232 108 / 0.7);
+}
+
+.cl-pathway {
+  position: relative;
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 880px) {
+  .cl-pathway {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--cl-way-gap);
+  }
+}
+
+.cl-stop {
+  position: relative;
+}
+.cl-stop-dot {
+  display: block;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--cl-forest-2);
+  border: 2px solid rgb(245 244 238 / 0.4);
+  transition:
+    background-color var(--cl-t-slow) var(--cl-ease),
+    border-color var(--cl-t-slow) var(--cl-ease),
+    box-shadow var(--cl-t-slow) var(--cl-ease);
+}
+.cl-stop.is-in .cl-stop-dot {
+  background: var(--cl-signal);
+  border-color: var(--cl-signal);
+  box-shadow: 0 0 0 5px rgb(197 232 108 / 0.16);
+}
+
+.cl-stop-index {
+  display: block;
+  margin-top: 1.35rem;
+  font-family: var(--cl-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  color: var(--cl-sage-on-dark);
+}
+.cl-stop h3 {
+  margin: 0.45rem 0 0;
+  color: var(--cl-on-dark);
+}
+.cl-stop p {
+  margin: 0.45rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.58;
+  color: var(--cl-on-dark-mute);
+  max-width: 28ch;
+}
+.cl-stop:last-child h3 {
+  color: var(--cl-signal);
+}
+
+/* Desktop: dots sit on the rail, copy hangs below. */
+@media (min-width: 880px) {
+  .cl-stop {
+    padding-top: 2.75rem;
+  }
+  .cl-stop-dot {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    margin-left: -6.5px;
+  }
+  .cl-stop-index {
+    margin-top: 0;
+  }
+}
+
+/* ───────────────────────────────────────────── mobile: vertical pathway ─── */
+
+@media (max-width: 879px) {
+  .cl-stop {
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    gap: 0 clamp(0.75rem, 3vw, 1.25rem);
+    padding: 1.5rem 0;
+  }
+  .cl-stop:first-child {
+    padding-top: 0;
+  }
+  .cl-stop-rail {
+    position: absolute;
+    top: 1.5rem;
+    bottom: -1.5rem;
+    left: 6px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--cl-on-dark-line);
+  }
+  .cl-stop:first-child .cl-stop-rail {
+    top: 0.4rem;
+  }
+  .cl-stop:last-child .cl-stop-rail {
+    display: none;
+  }
+  .cl-stop-rail::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--cl-signal);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.9s var(--cl-ease);
+  }
+  .cl-stop.is-in .cl-stop-rail::before {
+    transform: scaleY(1);
+  }
+  .cl-stop-index {
+    margin-top: 0;
+  }
+  .cl-stop p {
+    max-width: none;
+  }
+}
+@media (min-width: 880px) {
+  .cl-stop-rail {
+    display: none;
+  }
+}
