@@ -38,6 +38,20 @@ describe("arena grading", () => {
     expect(promptIdsValid(["nope"])).toBe(false);
     expect(promptIdsValid([ids[0], ids[0], ids[1], ids[2], ids[0], ids[1]])).toBe(false);
   });
+
+  it("grades deterministically, so a retry after a failed submit shows the same score", () => {
+    const first = gradeAnswer(STRONG);
+    const second = gradeAnswer(STRONG);
+    expect(second).toEqual(first);
+  });
+
+  it("grades the exact submitted text, independent of history", () => {
+    // Retrying the same answer against a reused session must not drift: the
+    // score is a pure function of the text, never of prior attempts.
+    const short = "it went fine I think";
+    expect(gradeAnswer(short)).toEqual(gradeAnswer(`  ${short}  `));
+    expect(gradeAnswer(STRONG).score).toBe(gradeAnswer(STRONG).score);
+  });
 });
 
 describe("rubric promotion boundary", () => {

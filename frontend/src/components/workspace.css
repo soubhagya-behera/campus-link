@@ -1,0 +1,135 @@
+/* ============================================================================
+   CAMPUSLINK — authenticated workspace theme (.ws scope)
+   Imports the landing palette (warm ivory canvas, deep forest, lime reserved
+   for meaningful highlights) into the signed-in workspace. Scoped to .ws so
+   the public landing (.cl), login (.lg) and registration (.rg) are untouched.
+
+   Strategy: the workspace was built with Tailwind dark utilities. Rather than
+   rewriting every page, this layer (a) defines semantic workspace tokens,
+   (b) remaps the handful of Tailwind color variables the pages use for text,
+   and (c) overrides white-on-dark washes/borders with light equivalents.
+   Solid lime primary actions keep their color (as on the landing page); lime
+   *text* becomes deep forest for contrast.
+   ========================================================================= */
+
+.ws {
+  --ws-canvas: #f5f4ee; /* warm ivory page */
+  --ws-surface: #ffffff; /* card / input surface */
+  --ws-forest: #173c2f; /* primary actions, headings */
+  --ws-forest-2: #1f4c3b;
+  --ws-ink: #202822; /* primary text — 12.4:1 on canvas */
+  --ws-mute: #4f5c50; /* secondary text — 6.6:1 on canvas */
+  --ws-faint: #5f7160; /* tiny mono labels */
+  --ws-line: #dde2d8; /* borders */
+  --ws-line-soft: #e9ece3; /* tracks, dividers */
+  --ws-lime: #c5e86c;
+  --ws-lime-ink: #3f5417;
+  --ws-lime-wash: rgb(197 232 108 / 0.22);
+  --ws-ok: #2f6b33;
+  --ws-ok-bg: #e6f1e3;
+  --ws-warn: #8a5a00;
+  --ws-warn-bg: #faf3e2;
+  --ws-err: #9b3226;
+  --ws-err-bg: #fbeeeb;
+  --ws-sky: #17536b;
+  --ws-sky-bg: #e9f2f7;
+
+  /* Tailwind text-variable remaps: muted-on-dark tones become readable ink. */
+  --color-slate-200: #202822;
+  --color-slate-300: #2b362c;
+  --color-slate-400: #4f5c50;
+  --color-slate-500: #4f5c50;
+  --color-slate-600: #5f7160;
+  --color-sky-300: #2a5c47;
+
+  color-scheme: light;
+  background: var(--ws-canvas);
+  color: var(--ws-ink);
+  overflow-x: clip;
+}
+
+.ws .font-display {
+  font-family: var(--font-syne), "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ── Dark washes → light surfaces ───────────────────────────────────────
+   (~= matches exact class tokens, so hover: variants keep working.) */
+
+.ws [class~="bg-ink-800"],
+.ws [class~="bg-ink-900/60"],
+.ws [class~="bg-ink-900/80"] {
+  background-color: var(--ws-surface);
+}
+
+.ws [class~="border-white/8"],
+.ws [class~="border-white/10"],
+.ws [class~="border-white/12"],
+.ws [class~="border-white/15"],
+.ws [class~="border-white/25"],
+.ws [class~="border-white/30"] {
+  border-color: var(--ws-line);
+}
+
+.ws [class~="bg-white/5"],
+.ws [class~="bg-white/6"],
+.ws [class~="bg-white/8"],
+.ws [class~="bg-white/[0.02]"],
+.ws [class~="bg-white/[0.03]"] {
+  background-color: rgb(23 60 47 / 0.045);
+}
+
+.ws .divide-white\/6 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--ws-line-soft);
+}
+
+/* ── Lime text (unreadable on ivory) → deep forest; solid lime stays ───── */
+
+.ws [class~="text-signal-300"],
+.ws [class~="text-signal-200"] {
+  color: var(--ws-forest-2);
+}
+
+.ws [class~="text-signal-400"] {
+  color: var(--ws-forest-2);
+}
+
+.ws [class~="text-ink-950"] {
+  color: var(--ws-forest);
+}
+
+.ws [class~="hover:text-signal-400"]:hover {
+  color: var(--ws-forest);
+}
+
+.ws [class~="hover:text-white"]:hover {
+  color: var(--ws-forest);
+}
+
+.ws [class~="text-white"] {
+  color: var(--ws-ink);
+}
+
+/* Amber warning text on light washes needs dark ink, never pale yellow. */
+.ws [class~="text-amber-200"],
+.ws [class~="text-amber-300"] {
+  color: var(--ws-warn);
+}
+
+/* ── Keyboard focus, touch targets, overflow ──────────────────────────── */
+
+.ws :focus-visible {
+  outline: 2px solid var(--ws-forest-2);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.ws button,
+.ws input:not([type="range"]),
+.ws select {
+  min-height: 44px;
+}
+
+.ws input[type="checkbox"],
+.ws input[type="radio"] {
+  min-height: initial;
+}

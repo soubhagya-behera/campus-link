@@ -1,12 +1,17 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { BadgeCheck, Download, Link2, ShieldCheck } from "lucide-react";
-import { Badge, Card, DemoTag, Empty, ErrorState, Loading, SectionTitle } from "../components/ui";
-import { useAttempts, useProfile } from "../store/session";
+import { Badge, Card, DemoTag, Empty, ErrorState, Loading, NoStudentState, SectionTitle } from "../components/ui";
+import { useAttempts, useProfile, useSessionUser } from "../store/session";
 
 export default function Passport() {
+  const user = useSessionUser();
   const profile = useProfile();
   const attempts = useAttempts();
   const qc = useQueryClient();
+
+  if (user && !user.studentProfileId) {
+    return <NoStudentState kicker="Proof-of-Skill Passport" title="Don't list skills. Prove them." />;
+  }
 
   if (profile.isPending) {
     return (

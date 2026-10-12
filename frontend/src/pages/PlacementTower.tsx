@@ -3,7 +3,7 @@ import { ArrowRight, FlaskConical, Search } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Card, DemoTag, ErrorState, Loading, Meter, SectionTitle } from "../components/ui";
-import { api } from "../lib/server";
+import { ApiError, api } from "../lib/server";
 import { useTower } from "../store/session";
 import { useQuery } from "@tanstack/react-query";
 
@@ -28,6 +28,29 @@ export default function PlacementTower() {
     );
   }
   if (tower.isError) {
+    // Students (and recruiters) cannot access placement aggregates: the API
+    // answers 403. Say so plainly with a way back, instead of a bare error
+    // whose Retry can never succeed.
+    if (tower.error instanceof ApiError && tower.error.status === 403) {
+      return (
+        <div>
+          <SectionTitle kicker="Placement Control Tower" title="The whole batch, one screen" right={<DemoTag />} />
+          <Card className="p-6">
+            <p className="text-sm font-semibold text-[var(--ws-ink)]">Placement access only</p>
+            <p className="mt-1 text-sm leading-relaxed text-[var(--ws-mute)]">
+              The Placement Tower shows every student&apos;s records, so it is limited to placement
+              staff accounts. Your student workspace is unaffected.
+            </p>
+            <Link
+              to="/app"
+              className="mt-4 inline-flex min-h-[44px] items-center gap-1.5 rounded-lg bg-signal-400 px-4 py-2 text-sm font-semibold text-ink-950 hover:bg-signal-300"
+            >
+              Back to your overview <ArrowRight size={14} />
+            </Link>
+          </Card>
+        </div>
+      );
+    }
     return (
       <div>
         <SectionTitle kicker="Placement Control Tower" title="The whole batch, one screen" right={<DemoTag />} />

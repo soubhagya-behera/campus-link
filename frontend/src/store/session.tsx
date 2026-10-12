@@ -194,4 +194,17 @@ export function useTower() {
   return useQuery({ queryKey: ["tower"], queryFn: api.towerStats });
 }
 
+export function useArenaPrompts() {
+  return useQuery({ queryKey: ["arena-prompts"], queryFn: api.arenaPrompts, staleTime: 5 * 60_000 });
+}
+
+export function useArenaSessions() {
+  const id = useProfileId();
+  return useQuery({
+    queryKey: ["arena-sessions", id],
+    queryFn: () => api.arenaSessions(id as string),
+    enabled: !!id,
+  });
+}
+
 export { client as queryClient };

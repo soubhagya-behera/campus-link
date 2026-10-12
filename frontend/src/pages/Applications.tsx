@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Undo2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Badge, Card, DemoTag, Empty, ErrorState, Loading, SectionTitle } from "../components/ui";
+import { Badge, Card, DemoTag, Empty, ErrorState, Loading, NoStudentState, SectionTitle } from "../components/ui";
 import { api } from "../lib/server";
-import { useApplications } from "../store/session";
+import { useApplications, useSessionUser } from "../store/session";
 
 const STATUS_TONE: Record<string, "signal" | "sky" | "amber" | "rose" | "neutral"> = {
   APPLIED: "sky",
@@ -14,6 +14,7 @@ const STATUS_TONE: Record<string, "signal" | "sky" | "amber" | "rose" | "neutral
 };
 
 export default function Applications() {
+  const user = useSessionUser();
   const applications = useApplications();
   const qc = useQueryClient();
 
@@ -24,6 +25,10 @@ export default function Applications() {
       void qc.invalidateQueries({ queryKey: ["readiness"] });
     },
   });
+
+  if (user && !user.studentProfileId) {
+    return <NoStudentState kicker="Applications" title="Every application, every next step" />;
+  }
 
   if (applications.isPending) {
     return (

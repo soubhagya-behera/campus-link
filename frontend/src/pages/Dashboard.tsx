@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, CalendarClock, Crosshair, ListChecks, Sparkles } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Card, DemoTag, ErrorState, Loading, Meter, Ring, SectionTitle } from "../components/ui";
 import { ApiError } from "../lib/server";
@@ -21,6 +22,8 @@ export default function Dashboard() {
   const matches = useMatches(3);
   const applications = useApplications();
   const qc = useQueryClient();
+  const [flash, setFlash] = useState<{ jobId: string; kind: "ok" | "dup" | "error"; message?: string } | null>(null);
+  const [pendingId, setPendingId] = useState<string | null>(null);
 
   // Placement and recruiter accounts own no student profile, so the overview
   // below can never load for them. Say so plainly instead of spinning forever.
@@ -78,14 +81,26 @@ export default function Dashboard() {
   const top = ranked[0];
   const activeApps = apps.filter((a) => a.status === "APPLIED" || a.status === "SHORTLISTED");
 
+  // Same visible states as Opportunity Mirror: pending, success, duplicate,
+  // failure. Every outcome is shown; nothing is thrown into the void.
   const applyQuick = async (jobId: string) => {
-    if (!profileId) return;
+    if (!profileId || pendingId) return;
+    setPendingId(jobId);
+    setFlash(null);
     try {
       await api.apply(jobId, profileId);
+      setFlash({ jobId, kind: "ok" });
       await qc.invalidateQueries({ queryKey: ["applications"] });
       await qc.invalidateQueries({ queryKey: ["readiness"] });
     } catch (e) {
-      if (!(e instanceof ApiError && e.status === 409)) throw e;
+      if (e instanceof ApiError && e.status === 409) {
+        setFlash({ jobId, kind: "dup" });
+      } else {
+        setFlash({ jobId, kind: "error", message: e instanceof Error ? e.message : "Application failed." });
+      }
+    } finally {
+      setPendingId(null);
+      setTimeout(() => setFlash((f) => (f?.jobId === jobId ? null : f)), 4000);
     }
   };
 
@@ -278,10 +293,26 @@ export default function Dashboard() {
                 ) : (
                   <button
                     onClick={() => void applyQuick(m.job.id)}
-                    className="mt-3 rounded-lg border border-signal-500/40 bg-signal-400/10 px-3 py-1.5 text-sm font-semibold text-signal-300 hover:bg-signal-400/20"
+                    disabled={pendingId !== null}
+                    className="mt-3 rounded-lg border border-signal-500/40 bg-signal-400/10 px-3 py-1.5 text-sm font-semibold text-signal-300 hover:bg-signal-400/20 disabled:opacity-50"
                   >
-                    Apply now
+                    {pendingId === m.job.id ? "Applying…" : "Apply now"}
                   </button>
+                )}
+                {flash?.jobId === m.job.id && flash.kind === "ok" && (
+                  <p className="mt-2 text-sm font-medium text-signal-300" role="status">
+                    Added to your application tracker.
+                  </p>
+                )}
+                {flash?.jobId === m.job.id && flash.kind === "dup" && (
+                  <p className="mt-2 text-sm font-medium text-amber-300" role="status">
+                    Already applied — the server refused the duplicate.
+                  </p>
+                )}
+                {flash?.jobId === m.job.id && flash.kind === "error" && (
+                  <p className="mt-2 text-sm font-medium text-[var(--ws-err)]" role="alert">
+                    {flash.message ?? "Application failed. Try again."}
+                  </p>
                 )}
               </Card>
             );

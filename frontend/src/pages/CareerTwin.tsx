@@ -2,14 +2,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, BadgeCheck, CircleAlert, Plus } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Badge, Card, DemoTag, Empty, ErrorState, Loading, SectionTitle } from "../components/ui";
+import { Badge, Card, DemoTag, Empty, ErrorState, Loading, NoStudentState, SectionTitle } from "../components/ui";
 import { ApiError, api, type Level } from "../lib/server";
-import { useMatches, useProfile, useProfileId } from "../store/session";
+import { useMatches, useProfile, useProfileId, useSessionUser } from "../store/session";
 
 const LEVELS: Level[] = ["BEGINNER", "INTERMEDIATE", "ADVANCED", "EXPERT"];
 
 export default function CareerTwin() {
   const profileId = useProfileId();
+  const user = useSessionUser();
   const profile = useProfile();
   const matches = useMatches(10);
   const qc = useQueryClient();
@@ -65,6 +66,10 @@ export default function CareerTwin() {
       setFormError(e instanceof ApiError ? e.message : "Could not save this evidence.");
     }
   };
+
+  if (user && !user.studentProfileId) {
+    return <NoStudentState kicker="Career Twin" title="Your skill mirror" />;
+  }
 
   if (profile.isPending) {
     return (

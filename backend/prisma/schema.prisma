@@ -192,12 +192,17 @@ model Project {
   url              String?
   /// Skill names this project evidences (kept as names for readable, explainable matching).
   skills           String[] @default([])
+  /// Assessment that auto-recorded this project as sprint evidence (null for
+  /// manually added projects). Lets repeat passing attempts refresh the same
+  /// evidence row instead of stacking duplicates.
+  assessmentId     String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   student StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
 
   @@index([studentProfileId])
+  @@index([studentProfileId, assessmentId])
 }
 
 // ---------- Companies & jobs ----------

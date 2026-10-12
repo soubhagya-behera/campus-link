@@ -1,14 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, Circle, Clock3, Send, Trophy } from "lucide-react";
 import { useState } from "react";
-import { Badge, Card, DemoTag, Empty, ErrorState, Loading, Meter, SectionTitle } from "../components/ui";
+import { Badge, Card, DemoTag, Empty, ErrorState, Loading, Meter, NoStudentState, SectionTitle } from "../components/ui";
 import { challengeContent } from "../data/challenges";
 import { cn } from "../lib/cn";
 import { ApiError, api } from "../lib/server";
-import { useAssessments, useAttempts, useProfileId } from "../store/session";
+import { useAssessments, useAttempts, useProfileId, useSessionUser } from "../store/session";
 
 export default function SkillSprint() {
   const profileId = useProfileId();
+  const user = useSessionUser();
   const assessments = useAssessments();
   const attempts = useAttempts();
   const qc = useQueryClient();
@@ -63,6 +64,10 @@ export default function SkillSprint() {
     },
     onError: (e) => setError(e instanceof ApiError ? e.message : "Submission failed"),
   });
+
+  if (user && !user.studentProfileId) {
+    return <NoStudentState kicker="Skill Sprint" title="Earn the skill, don't just claim it" />;
+  }
 
   if (assessments.isPending || attempts.isPending) {
     return (

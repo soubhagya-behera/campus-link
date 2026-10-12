@@ -4,6 +4,7 @@ import {
   Dumbbell,
   Fingerprint,
   LayoutDashboard,
+  LogOut,
   Medal,
   Radar,
   Swords,
@@ -11,10 +12,13 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { fetchHealth, fetchReady, type ApiStatus } from "../lib/api";
 import { cn } from "../lib/cn";
+import { api } from "../lib/server";
 import { isPlacement, useProfile, useReadiness, useSessionUser } from "../store/session";
+import { useQueryClient } from "@tanstack/react-query";
+import "./workspace.css";
 
 interface NavItem {
   to: string;
@@ -38,13 +42,13 @@ const STAFF_NAV: NavItem[] = [{ to: "/tower", label: "Placement Tower", icon: To
 function StatusPill({ label, status }: { label: string; status: ApiStatus | null }) {
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-slate-400"
+      className="inline-flex items-center gap-1.5 rounded-full border border-[var(--ws-line)] bg-[var(--ws-surface)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-[var(--ws-faint)]"
       title={status?.latencyMs != null ? `${status.latencyMs}ms` : "checking…"}
     >
       <span
         className={cn(
           "inline-block h-1.5 w-1.5 rounded-full",
-          status == null ? "bg-slate-500" : status.ok ? "bg-signal-400 live-dot" : "bg-rose-400",
+          status == null ? "bg-[#849581]" : status.ok ? "bg-[var(--ws-forest)] live-dot" : "bg-[var(--ws-err)]",
         )}
       />
       {label} {status == null ? "…" : status.ok ? "live" : "down"}
@@ -55,11 +59,15 @@ function StatusPill({ label, status }: { label: string; status: ApiStatus | null
 export default function Shell() {
   const [health, setHealth] = useState<ApiStatus | null>(null);
   const [ready, setReady] = useState<ApiStatus | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
   const readiness = useReadiness();
   const profile = useProfile();
   const user = useSessionUser();
   const placement = isPlacement(user);
   const location = useLocation();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
 
   useEffect(() => {
     let alive = true;
@@ -75,28 +83,45 @@ export default function Shell() {
     };
   }, [location.pathname]);
 
+  const signOut = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    setSignOutError(null);
+    try {
+      await api.logout();
+      await qc.invalidateQueries({ queryKey: ["session"] });
+      navigate("/login", { replace: true });
+    } catch (e) {
+      // Stay signed in: the server rejected the request, so claiming
+      // otherwise would strand the user on a false login screen.
+      setSignOutError(e instanceof Error ? e.message : "Sign out failed. Try again.");
+    } finally {
+      setSigningOut(false);
+    }
+  };
+
   const score = readiness.data?.score;
 
   return (
-    <div className="flex min-h-full">
+    <div className="ws flex min-h-full">
       {/* Sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-white/8 bg-ink-900/60 px-4 py-6 lg:flex">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-[var(--ws-line)] bg-[var(--ws-surface)] px-4 py-6 lg:flex">
         <div className="flex items-center gap-3 px-2">
-          <div className="font-display flex h-10 w-10 items-center justify-center rounded-xl bg-signal-400 text-lg font-bold text-ink-950">
+          <div className="font-display flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--ws-forest)] text-lg font-bold text-[var(--ws-canvas)]">
             C
           </div>
           <div>
-            <p className="font-display text-base font-bold tracking-tight text-white">CAMPUSLINK</p>
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            <p className="font-display text-base font-bold tracking-tight text-[var(--ws-ink)]">CAMPUSLINK</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--ws-faint)]">
               Career Intel OS
             </p>
           </div>
         </div>
 
-        <p className="mt-8 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500">
+        <p className="mt-8 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--ws-faint)]">
           {placement ? "Workspace" : "Student"}
         </p>
-        <nav className="mt-2 space-y-1">
+        <nav className="mt-2 space-y-1" aria-label="Workspace">
           {STUDENT_NAV.map((n) => (
             <NavLink
               key={n.to}
@@ -104,10 +129,10 @@ export default function Shell() {
               end={n.end}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
+                  "flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
                   isActive
-                    ? "bg-signal-400/10 text-signal-300"
-                    : "text-slate-400 hover:bg-white/5 hover:text-white",
+                    ? "bg-[var(--ws-lime-wash)] font-semibold text-[var(--ws-forest)]"
+                    : "text-[var(--ws-mute)] hover:bg-[#eef0ea] hover:text-[var(--ws-forest)]",
                 )
               }
             >
@@ -121,20 +146,20 @@ export default function Shell() {
             from other roles avoids sending them to a guaranteed 403. */}
         {placement ? (
           <>
-            <p className="mt-6 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            <p className="mt-6 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--ws-faint)]">
               Placement cell
             </p>
-            <nav className="mt-2 space-y-1">
+            <nav className="mt-2 space-y-1" aria-label="Placement">
               {STAFF_NAV.map((n) => (
                 <NavLink
                   key={n.to}
                   to={n.to}
                   className={({ isActive }) =>
                     cn(
-                      "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
+                      "flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
                       isActive
-                        ? "bg-sky-400/10 text-sky-300"
-                        : "text-slate-400 hover:bg-white/5 hover:text-white",
+                        ? "bg-[var(--ws-forest)] text-[var(--ws-canvas)]"
+                        : "text-[var(--ws-mute)] hover:bg-[#eef0ea] hover:text-[var(--ws-forest)]",
                     )
                   }
                 >
@@ -146,47 +171,63 @@ export default function Shell() {
           </>
         ) : null}
 
-        <div className="mt-auto rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+        <div className="mt-auto rounded-2xl border border-[var(--ws-line)] bg-[var(--ws-canvas)] p-4">
           <div className="flex items-center justify-between">
-            <p className="font-mono text-[10px] uppercase tracking-widest text-slate-500">Readiness</p>
-            <Backpack size={14} className="text-slate-500" />
+            <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--ws-faint)]">Readiness</p>
+            <Backpack size={14} className="text-[var(--ws-faint)]" />
           </div>
-          <p className="font-display mt-1 text-3xl font-bold text-white">
+          <p className="font-display mt-1 text-3xl font-bold text-[var(--ws-ink)]">
             {score ?? "–"}
-            <span className="text-sm text-slate-500">/100</span>
+            <span className="text-sm text-[var(--ws-faint)]">/100</span>
           </p>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/8">
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--ws-line-soft)]">
             <div
-              className="h-full rounded-full bg-signal-400 transition-all"
+              className="h-full rounded-full bg-[var(--ws-forest)] transition-all"
               style={{ width: `${score ?? 0}%` }}
             />
           </div>
-          <p className="mt-1.5 font-mono text-[10px] text-slate-600">from PostgreSQL records</p>
+          <p className="mt-1.5 font-mono text-[10px] text-[var(--ws-faint)]">from PostgreSQL records</p>
         </div>
       </aside>
 
       {/* Main */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 border-b border-white/8 bg-ink-950/85 backdrop-blur">
+        <header className="sticky top-0 z-10 border-b border-[var(--ws-line)] bg-[var(--ws-surface)]/90 backdrop-blur">
           <div className="flex items-center gap-3 px-4 py-3 sm:px-8">
-            <div className="font-display flex h-9 w-9 items-center justify-center rounded-lg bg-signal-400 font-bold text-ink-950 lg:hidden">
+            <div className="font-display flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--ws-forest)] font-bold text-[var(--ws-canvas)] lg:hidden">
               C
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-white">
+              <p className="truncate text-sm font-semibold text-[var(--ws-ink)]">
                 {profile.data ? `${profile.data.fullName} · ${profile.data.branch ?? ""}` : "CAMPUSLINK"}
               </p>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-slate-500">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--ws-faint)]">
                 {user ? `Signed in as ${user.email} · ${user.role}` : "Local session"}
               </p>
             </div>
             <div className="ml-auto flex items-center gap-2">
               <StatusPill label="api" status={health} />
               <StatusPill label="db" status={ready} />
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                disabled={signingOut}
+                aria-label="Sign out of CAMPUSLINK"
+                title="Sign out"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-[var(--ws-forest)] px-3 py-2 text-sm font-semibold text-[var(--ws-forest)] hover:bg-[var(--ws-forest)] hover:text-[var(--ws-canvas)] disabled:opacity-50"
+              >
+                <LogOut size={15} />
+                <span className="hidden sm:inline">{signingOut ? "Signing out…" : "Sign out"}</span>
+              </button>
             </div>
           </div>
+          {signOutError ? (
+            <p role="alert" className="border-t border-[#e8c6bf] bg-[var(--ws-err-bg)] px-4 py-2 text-sm text-[var(--ws-err)] sm:px-8">
+              {signOutError} You are still signed in.
+            </p>
+          ) : null}
           {/* Mobile nav */}
-          <nav className="flex gap-1 overflow-x-auto px-4 pb-3 lg:hidden">
+          <nav className="flex gap-1 overflow-x-auto px-4 pb-3 lg:hidden" aria-label="Workspace">
             {(placement ? [...STUDENT_NAV, ...STAFF_NAV] : STUDENT_NAV).map((n) => (
               <NavLink
                 key={n.to}
@@ -194,10 +235,10 @@ export default function Shell() {
                 end={n.end}
                 className={({ isActive }) =>
                   cn(
-                    "flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium",
+                    "flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium",
                     isActive
-                      ? "border-signal-500/40 bg-signal-400/10 text-signal-300"
-                      : "border-white/10 text-slate-400",
+                      ? "border-[var(--ws-forest)] bg-[var(--ws-lime-wash)] text-[var(--ws-forest)]"
+                      : "border-[var(--ws-line)] bg-[var(--ws-surface)] text-[var(--ws-mute)]",
                   )
                 }
               >
@@ -212,8 +253,8 @@ export default function Shell() {
           <Outlet />
         </main>
 
-        <footer className="border-t border-white/8 px-8 py-4">
-          <p className="font-mono text-[11px] text-slate-600">
+        <footer className="border-t border-[var(--ws-line)] px-8 py-4">
+          <p className="font-mono text-[11px] leading-relaxed text-[var(--ws-faint)]">
             CAMPUSLINK dev build · local PostgreSQL + Express API · rule-based scoring, no AI
             predictions · localhost only — do not expose publicly
           </p>

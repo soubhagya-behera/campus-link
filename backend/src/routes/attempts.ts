@@ -3,6 +3,7 @@ import { z } from "zod";
 import prisma from "../lib/prisma.js";
 import { nextLevel } from "../lib/match.js";
 import { PROMOTION_THRESHOLD, RUBRIC_DESCRIPTION, RUBRIC_VERSION, gradeSubmission } from "../lib/rubric.js";
+import { upsertSprintEvidence } from "../lib/sprint-evidence.js";
 import { parsePaging, sendInvalid } from "../lib/validate.js";
 import { requireAuth, resolveStudentScope } from "../lib/auth.js";
 
@@ -112,16 +113,16 @@ router.post("/", requireAuth, async (req, res, next) => {
           update: { level: promotedTo as never },
           create: { studentProfileId, skillId: skill.id, level: promotedTo as never },
         });
-        const evidence = await tx.project.create({
-          data: {
-            studentProfileId,
-            title: `Sprint: ${assessment.title}`,
-            description: `Reviewed submission (${score}/100). ${note.slice(0, 280)}`,
-            url: repoUrl || undefined,
-            skills: [assessment.rewardSkill],
-          },
+        const evidence = await upsertSprintEvidence(tx, {
+          studentProfileId,
+          assessmentId: assessment.id,
+          assessmentTitle: assessment.title,
+          rewardSkill: assessment.rewardSkill,
+          score,
+          note,
+          repoUrl: repoUrl || null,
         });
-        evidenceProjectId = evidence.id;
+        evidenceProjectId = evidence.evidenceProjectId;
       }
       return { attempt, promotedTo, evidenceProjectId };
     });

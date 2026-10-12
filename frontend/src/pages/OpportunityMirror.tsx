@@ -2,12 +2,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, CheckCircle2, CircleAlert, Plus, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Badge, Card, DemoTag, Empty, ErrorState, Loading, Meter, SectionTitle } from "../components/ui";
+import { Badge, Card, DemoTag, Empty, ErrorState, Loading, Meter, NoStudentState, SectionTitle } from "../components/ui";
 import { ApiError, api } from "../lib/server";
-import { useApplications, useMatches, useProfileId } from "../store/session";
+import { useApplications, useMatches, useProfileId, useSessionUser } from "../store/session";
 
 export default function OpportunityMirror() {
   const profileId = useProfileId();
+  const user = useSessionUser();
   const matches = useMatches(20);
   const applications = useApplications();
   const qc = useQueryClient();
@@ -28,6 +29,10 @@ export default function OpportunityMirror() {
       setTimeout(() => setFlash(null), 3000);
     },
   });
+
+  if (user && !user.studentProfileId) {
+    return <NoStudentState kicker="Opportunity Mirror" title="Ranked by fit, explained in plain words" />;
+  }
 
   if (matches.isPending || applications.isPending) {
     return (
@@ -70,13 +75,13 @@ export default function OpportunityMirror() {
       {ranked.length === 0 ? (
         <Empty
           title="No open opportunities"
-          body="There are no OPEN postings in PostgreSQL right now. Ask the placement cell to publish the first drive — the Tower lists every opening."
+          body="There are no OPEN postings in PostgreSQL right now. New drives appear here as soon as the placement cell publishes them — meanwhile, sprints keep your record growing."
           action={
             <Link
-              to="/tower"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-signal-400 px-3 py-2 text-sm font-semibold text-ink-950"
+              to="/sprint"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg bg-signal-400 px-3 py-2 text-sm font-semibold text-ink-950"
             >
-              Open Placement Tower <ArrowRight size={14} />
+              Practice with Skill Sprint <ArrowRight size={14} />
             </Link>
           }
         />

@@ -165,6 +165,23 @@ export interface Readiness {
   skills: SkillRecord[];
 }
 
+export interface ArenaPrompt {
+  id: string;
+  category: "Behavioral" | "Technical" | "Situational";
+  prompt: string;
+  hint: string;
+}
+
+export interface ArenaSession {
+  id: string;
+  studentProfileId: string;
+  type: string;
+  transcript: string | null;
+  feedback: string | null;
+  score: number | null;
+  createdAt: string;
+}
+
 export interface TowerStats {
   students: number;
   openOpportunities: number;
@@ -316,6 +333,41 @@ export const api = {
   },
   towerStats(): Promise<TowerStats> {
     return request<Envelope<TowerStats>>("/api/tower/stats").then((r) => r.data);
+  },
+  /** Curated prompt bank + scoring method. Any authenticated role. */
+  arenaPrompts(): Promise<{ data: ArenaPrompt[]; method: string; version: string }> {
+    return request<Envelope<ArenaPrompt[]> & { version?: string }>("/api/arena/prompts").then((r) => ({
+      data: r.data,
+      method: r.method ?? "",
+      version: r.version ?? "",
+    }));
+  },
+  /** Start a persisted practice session. Students as themselves only. */
+  createArenaSession(input: {
+    studentProfileId: string;
+    type: string;
+    promptIds: string[];
+  }): Promise<ArenaSession> {
+    return request<Envelope<ArenaSession>>("/api/arena/sessions", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }).then((r) => r.data);
+  },
+  /** Grade answers server-side; persists score + feedback on the session. */
+  submitArenaAnswers(
+    sessionId: string,
+    answers: { promptId: string; text: string }[],
+  ): Promise<{ session: ArenaSession; method: string }> {
+    return request<Envelope<ArenaSession>>(`/api/arena/sessions/${sessionId}/answers`, {
+      method: "POST",
+      body: JSON.stringify({ answers }),
+    }).then((r) => ({ session: r.data, method: r.method ?? "" }));
+  },
+  /** Own persisted sessions (owner or placement). */
+  arenaSessions(studentProfileId: string): Promise<{ data: ArenaSession[]; method: string }> {
+    return request<Envelope<ArenaSession[]>>(
+      `/api/arena/sessions?studentProfileId=${studentProfileId}&limit=50`,
+    ).then((r) => ({ data: r.data, method: r.method ?? "" }));
   },
   students(params?: { search?: string; branch?: string; page?: number; limit?: number }): Promise<{
     data: StudentRow[];
