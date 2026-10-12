@@ -103,6 +103,69 @@ const createBody = z.object({
   studentProfileId: z.string().trim().min(1),
 });
 
+/** Shared public shape for one application (list and single-read agree). */
+export function publicApplication(a: {
+  id: string;
+  status: unknown;
+  appliedAt: unknown;
+  updatedAt: unknown;
+  student: unknown;
+  job: {
+    id: string;
+    title: string;
+    company: { name: string };
+    location: unknown;
+    type: unknown;
+    salary: unknown;
+    deadline: unknown;
+  };
+}) {
+  return {
+    id: a.id,
+    status: a.status,
+    appliedAt: a.appliedAt,
+    updatedAt: a.updatedAt,
+    student: a.student,
+    job: {
+      id: a.job.id,
+      title: a.job.title,
+      company: a.job.company.name,
+      location: a.job.location,
+      type: a.job.type,
+      salary: a.job.salary,
+      deadline: a.job.deadline,
+    },
+  };
+}
+
+/**
+ * GET /api/applications/:id — one application with candidate + job.
+ * Placement sees any; students their own; recruiters applicants to their own
+ * company's postings only. Powers the staff applicant-review screen.
+ */
+router.get("/:id", requireAuth, async (req, res, next) => {
+  try {
+    const current = await prisma.application.findUnique({
+      where: { id: req.params.id },
+      include: {
+        job: { include: { company: true } },
+        student: { select: { id: true, fullName: true, enrollmentNo: true, branch: true } },
+      },
+    });
+    if (!current) return res.status(404).json({ ok: false, error: "Application not found" });
+    const role = req.auth?.role;
+    const isOwner = role === "STUDENT" && req.auth?.studentProfileId === current.studentProfileId;
+    const isJobRecruiter = role === "RECRUITER" && req.auth?.companyId === current.job.companyId;
+    const isPlacement = role === "STAFF" || role === "ADMIN";
+    if (!isOwner && !isJobRecruiter && !isPlacement) {
+      return res.status(403).json({ ok: false, error: "Insufficient permissions" });
+    }
+    res.json({ ok: true, data: publicApplication(current) });
+  } catch (err) {
+    next(err);
+  }
+});
+
 /** POST /api/applications — students apply as themselves (derived id);
  * placement may file for any profile; recruiters cannot apply. */
 router.post("/", requireAuth, async (req, res, next) => {

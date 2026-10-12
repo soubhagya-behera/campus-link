@@ -1,8 +1,4 @@
-/**
- * Typed client for the CAMPUSLINK Express API.
- * Server is the authority for all persisted data; nothing is faked here.
- * Mutations throw ApiError (with HTTP status) so UI states stay truthful.
- */
+/** Typed CAMPUSLINK API client. Server is the authority; mutations throw ApiError. */
 import { API_BASE } from "./api";
 
 export class ApiError extends Error {
@@ -43,16 +39,13 @@ async function requestImpl<T>(path: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
-/**
- * Shared JSON request helper. Exported so the public pages (login, register)
- * send cookies through exactly the same path as the authenticated app,
- * instead of growing a second HTTP client with subtly different rules.
- */
+/** Shared JSON client: login/register use this path so cookies travel identically. */
 export const request = requestImpl;
 
 export type Level = "BEGINNER" | "INTERMEDIATE" | "ADVANCED" | "EXPERT";
 
 export interface SkillRecord {
+  id: string;
   skill: string;
   level: Level;
   evidence: string[];
@@ -70,11 +63,14 @@ export interface ProjectRecord {
 export interface StudentProfile {
   id: string;
   fullName: string;
+  email: string | null;
   enrollmentNo: string | null;
   branch: string | null;
+  institution: string | null;
   graduationYear: number | null;
   cgpa: number | null;
   resumeUrl: string | null;
+  createdAt: string;
   skills: SkillRecord[];
   projects: ProjectRecord[];
 }
@@ -107,7 +103,12 @@ export interface MatchFactor {
 }
 
 export interface JobMatch {
-  job: Omit<Opportunity, "applicationCount">;
+  /** Job shape from GET /api/students/:id/matches: parsed `required`
+   *  requirements and `seniority` included, `requiredSkills` absent. */
+  job: Omit<Opportunity, "applicationCount" | "requiredSkills"> & {
+    required: JobRequirement[];
+    seniority: string | null;
+  };
   score: number;
   met: JobRequirement[];
   gaps: JobRequirement[];
@@ -121,6 +122,7 @@ export interface ApplicationRecord {
   status: string;
   appliedAt: string;
   updatedAt: string;
+  student?: { id: string; fullName: string; enrollmentNo: string | null; branch: string | null };
   job: {
     id: string;
     title: string;
@@ -165,23 +167,6 @@ export interface Readiness {
   skills: SkillRecord[];
 }
 
-export interface ArenaPrompt {
-  id: string;
-  category: "Behavioral" | "Technical" | "Situational";
-  prompt: string;
-  hint: string;
-}
-
-export interface ArenaSession {
-  id: string;
-  studentProfileId: string;
-  type: string;
-  transcript: string | null;
-  feedback: string | null;
-  score: number | null;
-  createdAt: string;
-}
-
 export interface TowerStats {
   students: number;
   openOpportunities: number;
@@ -195,10 +180,12 @@ export interface TowerStats {
 export interface StudentRow {
   id: string;
   fullName: string;
+  email: string | null;
   enrollmentNo: string | null;
   branch: string | null;
   graduationYear: number | null;
   cgpa: number | null;
+  createdAt: string;
   skillCount: number;
   applicationCount: number;
   projectCount: number;
@@ -255,10 +242,16 @@ export const api = {
       body: JSON.stringify({ skills }),
     }).then(() => undefined);
   },
-  addProject(
-    id: string,
-    p: { title: string; description?: string; url?: string; skills: string[] },
-  ): Promise<ProjectRecord> {
+  updateSkill(id: string, skillId: string, p: { name?: string; level?: Level }): Promise<void> {
+    return request(`/api/students/${id}/skills/${skillId}`, {
+      method: "PATCH",
+      body: JSON.stringify(p),
+    }).then(() => undefined);
+  },
+  deleteSkill(id: string, skillId: string): Promise<void> {
+    return request(`/api/students/${id}/skills/${skillId}`, { method: "DELETE" }).then(() => undefined);
+  },
+  addProject(id: string, p: { title: string; description?: string; url?: string; skills: string[] }): Promise<ProjectRecord> {
     return request<Envelope<ProjectRecord>>(`/api/students/${id}/projects`, {
       method: "POST",
       body: JSON.stringify(p),
@@ -291,16 +284,28 @@ export const api = {
       total: r.total ?? r.data.length,
     }));
   },
-  applications(studentProfileId: string): Promise<ApplicationRecord[]> {
-    return request<Envelope<ApplicationRecord[]>>(
-      `/api/applications?studentProfileId=${studentProfileId}&limit=50`,
-    ).then((r) => r.data);
+  applications(filter: { studentProfileId?: string; jobId?: string; status?: string; limit?: number }): Promise<ApplicationRecord[]> {
+    const q = new URLSearchParams({
+      ...(filter.studentProfileId ? { studentProfileId: filter.studentProfileId } : {}),
+      ...(filter.jobId ? { jobId: filter.jobId } : {}),
+      ...(filter.status && filter.status !== "All" ? { status: filter.status } : {}),
+      limit: String(filter.limit ?? 50),
+    });
+    return request<Envelope<ApplicationRecord[]>>(`/api/applications?${q}`).then((r) => r.data);
   },
   apply(jobId: string, studentProfileId: string): Promise<{ id: string }> {
     return request<Envelope<{ id: string }>>("/api/applications", {
       method: "POST",
       body: JSON.stringify({ jobId, studentProfileId }),
     }).then((r) => r.data);
+  },
+  /** One opportunity by id. Same visibility rules as the list. */
+  opportunity(id: string): Promise<Opportunity> {
+    return request<Envelope<Opportunity>>(`/api/opportunities/${id}`).then((r) => r.data);
+  },
+  /** One application with candidate + job. Staff any; students own; recruiters own-company. */
+  application(id: string): Promise<ApplicationRecord> {
+    return request<Envelope<ApplicationRecord>>(`/api/applications/${id}`).then((r) => r.data);
   },
   setApplicationStatus(id: string, status: string): Promise<void> {
     return request(`/api/applications/${id}`, {
@@ -333,41 +338,6 @@ export const api = {
   },
   towerStats(): Promise<TowerStats> {
     return request<Envelope<TowerStats>>("/api/tower/stats").then((r) => r.data);
-  },
-  /** Curated prompt bank + scoring method. Any authenticated role. */
-  arenaPrompts(): Promise<{ data: ArenaPrompt[]; method: string; version: string }> {
-    return request<Envelope<ArenaPrompt[]> & { version?: string }>("/api/arena/prompts").then((r) => ({
-      data: r.data,
-      method: r.method ?? "",
-      version: r.version ?? "",
-    }));
-  },
-  /** Start a persisted practice session. Students as themselves only. */
-  createArenaSession(input: {
-    studentProfileId: string;
-    type: string;
-    promptIds: string[];
-  }): Promise<ArenaSession> {
-    return request<Envelope<ArenaSession>>("/api/arena/sessions", {
-      method: "POST",
-      body: JSON.stringify(input),
-    }).then((r) => r.data);
-  },
-  /** Grade answers server-side; persists score + feedback on the session. */
-  submitArenaAnswers(
-    sessionId: string,
-    answers: { promptId: string; text: string }[],
-  ): Promise<{ session: ArenaSession; method: string }> {
-    return request<Envelope<ArenaSession>>(`/api/arena/sessions/${sessionId}/answers`, {
-      method: "POST",
-      body: JSON.stringify({ answers }),
-    }).then((r) => ({ session: r.data, method: r.method ?? "" }));
-  },
-  /** Own persisted sessions (owner or placement). */
-  arenaSessions(studentProfileId: string): Promise<{ data: ArenaSession[]; method: string }> {
-    return request<Envelope<ArenaSession[]>>(
-      `/api/arena/sessions?studentProfileId=${studentProfileId}&limit=50`,
-    ).then((r) => ({ data: r.data, method: r.method ?? "" }));
   },
   students(params?: { search?: string; branch?: string; page?: number; limit?: number }): Promise<{
     data: StudentRow[];

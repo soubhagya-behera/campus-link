@@ -17,6 +17,12 @@ describe("application transitions", () => {
     expect(canTransition("HIRED", "WITHDRAWN")).toBe(false);
     expect(canTransition("WITHDRAWN", "APPLIED")).toBe(false);
   });
+
+  it("keeps WITHDRAWN terminal in every direction, so a withdrawn row can never reactivate", () => {
+    for (const to of ["APPLIED", "SHORTLISTED", "REJECTED", "HIRED", "WITHDRAWN"] as const) {
+      expect(canTransition("WITHDRAWN", to)).toBe(false);
+    }
+  });
 });
 
 describe("sprint rubric", () => {

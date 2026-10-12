@@ -48,8 +48,32 @@
   overflow-x: clip;
 }
 
+/* Readable type: Inter for everything inside the workspace (headings, body,
+   cards, buttons, nav, labels, metadata). The decorative display face stays
+   on the public landing only. Landing (.cl), login (.lg) and register (.rg)
+   scopes are untouched by these rules. */
 .ws .font-display {
-  font-family: var(--font-syne), "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+}
+
+.ws .font-mono {
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
+}
+
+.ws h1 {
+  line-height: 1.15;
+}
+
+.ws h2,
+.ws h3 {
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+.ws button {
+  overflow-wrap: break-word;
 }
 
 /* ── Dark washes → light surfaces ───────────────────────────────────────

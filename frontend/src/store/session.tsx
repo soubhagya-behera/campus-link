@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-quer
 import { createContext, useContext, type ReactNode } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { ApiError, api, type Role, type SessionUser } from "../lib/server";
+import { arenaPrompts, arenaSessions } from "../lib/arena";
 
 const client = new QueryClient({
   defaultOptions: {
@@ -172,7 +173,7 @@ export function useApplications() {
   const id = useProfileId();
   return useQuery({
     queryKey: ["applications", id],
-    queryFn: () => api.applications(id as string),
+    queryFn: () => api.applications({ studentProfileId: id as string }),
     enabled: !!id,
   });
 }
@@ -190,19 +191,19 @@ export function useAttempts() {
   });
 }
 
-export function useTower() {
-  return useQuery({ queryKey: ["tower"], queryFn: api.towerStats });
+export function useTower(enabled = true) {
+  return useQuery({ queryKey: ["tower"], queryFn: api.towerStats, enabled });
 }
 
 export function useArenaPrompts() {
-  return useQuery({ queryKey: ["arena-prompts"], queryFn: api.arenaPrompts, staleTime: 5 * 60_000 });
+  return useQuery({ queryKey: ["arena-prompts"], queryFn: arenaPrompts, staleTime: 5 * 60_000 });
 }
 
 export function useArenaSessions() {
   const id = useProfileId();
   return useQuery({
     queryKey: ["arena-sessions", id],
-    queryFn: () => api.arenaSessions(id as string),
+    queryFn: () => arenaSessions(id as string),
     enabled: !!id,
   });
 }

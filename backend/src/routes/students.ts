@@ -34,7 +34,8 @@ function parseRequirements(raw: unknown): Requirement[] {
   return out;
 }
 
-/** GET /api/students — placement-only directory (STAFF/ADMIN). No emails exposed. */
+/** GET /api/students — placement-only directory (STAFF/ADMIN). Includes the
+ *  account email and record creation date staff need; no passwords or hashes. */
 router.get("/", requireAuth, requireRole("STAFF", "ADMIN"), async (req, res, next) => {
   try {
     const { page, limit } = parsePaging(req);
@@ -47,6 +48,7 @@ router.get("/", requireAuth, requireRole("STAFF", "ADMIN"), async (req, res, nex
             OR: [
               { fullName: { contains: search, mode: "insensitive" as const } },
               { enrollmentNo: { contains: search, mode: "insensitive" as const } },
+              { user: { email: { contains: search, mode: "insensitive" as const } } },
             ],
           }
         : {}),
@@ -70,10 +72,12 @@ router.get("/", requireAuth, requireRole("STAFF", "ADMIN"), async (req, res, nex
       data: rows.map((p) => ({
         id: p.id,
         fullName: p.fullName,
+        email: p.user?.email ?? null,
         enrollmentNo: p.enrollmentNo,
         branch: p.branch,
         graduationYear: p.graduationYear,
         cgpa: p.cgpa,
+        createdAt: p.createdAt,
         skillCount: p.skills.length,
         applicationCount: p._count.apps,
         projectCount: p._count.projects,
@@ -114,12 +118,16 @@ router.get("/:id", requireAuth, async (req, res, next) => {
       data: {
         id: profile.id,
         fullName: profile.fullName,
+        email: profile.user?.email ?? null,
         enrollmentNo: profile.enrollmentNo,
         branch: profile.branch,
+        institution: profile.institution,
         graduationYear: profile.graduationYear,
         cgpa: profile.cgpa,
         resumeUrl: profile.resumeUrl,
+        createdAt: profile.createdAt,
         skills: profile.skills.map((ss) => ({
+          id: ss.id,
           skill: ss.skill.name,
           level: ss.level,
           evidence: evidenceBySkill.get(ss.skill.name.toLowerCase()) ?? [],
@@ -177,6 +185,88 @@ router.patch("/:id/skills", requireAuth, async (req, res, next) => {
       }
     });
     res.json({ ok: true, updated: deduped.length });
+  } catch (err) {
+    next(err);
+  }
+});
+
+const skillPatchBody = z
+  .object({
+    name: z.string().trim().min(1).max(60).optional(),
+    level: LEVEL.optional(),
+  })
+  .refine((b) => b.name !== undefined || b.level !== undefined, {
+    message: "Provide a name and/or level to update",
+  });
+
+/**
+ * PATCH /api/students/:id/skills/:skillId — rename and/or re-level one
+ * recorded skill. Names stay unique per student (case-insensitive): a clash
+ * with another of their skills is 409. Renaming only re-links the catalog
+ * entry — projects keep their skill names, so evidence is never destroyed.
+ */
+router.patch("/:id/skills/:skillId", requireAuth, async (req, res, next) => {
+  try {
+    const parsed = skillPatchBody.safeParse(req.body);
+    if (!parsed.success) return sendInvalid(res, parsed.error);
+    const id = resolveStudentScope(req, res, req.params.id);
+    if (!id) return;
+    const link = await prisma.studentSkill.findUnique({
+      where: { id: req.params.skillId },
+      include: { skill: true },
+    });
+    if (!link || link.studentProfileId !== id) {
+      return res.status(404).json({ ok: false, error: "Recorded skill not found" });
+    }
+    let skillId = link.skillId;
+    if (parsed.data.name !== undefined && parsed.data.name.toLowerCase() !== link.skill.name.toLowerCase()) {
+      const clash = await prisma.studentSkill.findFirst({
+        where: {
+          studentProfileId: id,
+          skill: { name: { equals: parsed.data.name, mode: "insensitive" } },
+        },
+        select: { id: true },
+      });
+      if (clash) {
+        return res.status(409).json({ ok: false, error: "That skill is already recorded — adjust its level instead." });
+      }
+      const target = await prisma.skill.upsert({
+        where: { name: parsed.data.name },
+        update: {},
+        create: { name: parsed.data.name },
+      });
+      skillId = target.id;
+    }
+    const updated = await prisma.studentSkill.update({
+      where: { id: link.id },
+      data: {
+        skillId,
+        ...(parsed.data.level !== undefined ? { level: parsed.data.level } : {}),
+      },
+      include: { skill: true },
+    });
+    res.json({ ok: true, data: { id: updated.id, skill: updated.skill.name, level: updated.level } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/**
+ * DELETE /api/students/:id/skills/:skillId — remove one recorded skill.
+ * Deletes only the link row: projects, attempts and sessions are untouched,
+ * so history and evidence survive. Afterwards the skill simply stops
+ * matching until re-recorded.
+ */
+router.delete("/:id/skills/:skillId", requireAuth, async (req, res, next) => {
+  try {
+    const id = resolveStudentScope(req, res, req.params.id);
+    if (!id) return;
+    const link = await prisma.studentSkill.findUnique({ where: { id: req.params.skillId } });
+    if (!link || link.studentProfileId !== id) {
+      return res.status(404).json({ ok: false, error: "Recorded skill not found" });
+    }
+    await prisma.studentSkill.delete({ where: { id: link.id } });
+    res.json({ ok: true, data: { id: link.id } });
   } catch (err) {
     next(err);
   }

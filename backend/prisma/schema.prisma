@@ -75,6 +75,8 @@ model User {
   assessments    Assessment[]    @relation("AssessmentAuthor")
   company        Company?        @relation(fields: [companyId], references: [id], onDelete: SetNull)
   sessions       Session[]
+  announcements  Announcement[]
+  arenaPrompts   ArenaPrompt[]   @relation("ArenaPromptAuthor")
 
   @@index([role])
   @@index([companyId])
@@ -156,6 +158,8 @@ model StudentProfile {
   apps       Application[]
   attempts   AssessmentAttempt[]
   interviews InterviewSession[]
+  announcementReceipts AnnouncementRecipient[]
+  arenaPoints ArenaPointLedger[]
 
   @@index([graduationYear])
   @@index([branch])
@@ -217,6 +221,7 @@ model Company {
 
   jobs  JobOpportunity[]
   users User[]
+  announcements Announcement[]
 }
 
 model JobOpportunity {
@@ -240,6 +245,7 @@ model JobOpportunity {
 
   company Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   apps    Application[]
+  announcements Announcement[]
 
   @@index([companyId])
   @@index([status])
@@ -304,6 +310,47 @@ model AssessmentAttempt {
 
 // ---------- Interview practice ----------
 
+enum ArenaPromptCategory {
+  Behavioral
+  Technical
+  Situational
+}
+
+/// Staff-managed question bank. Static curated prompts in lib/arena.ts act
+/// only as a fallback while this table is empty; deactivating a row never
+/// touches existing sessions (answers and scores stay on record).
+model ArenaPrompt {
+  id        String               @id @default(cuid())
+  category  ArenaPromptCategory
+  prompt    String
+  hint      String?
+  isActive  Boolean              @default(true)
+  authorId  String?
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  author User? @relation("ArenaPromptAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([isActive])
+  @@index([authorId])
+}
+
+/// Practice points ledger: one row per answered session. Re-grading the same
+/// session updates its row, so retries can never mint duplicate rewards.
+/// points = floor(score/10), 0–10, derived server-side from the graded score.
+model ArenaPointLedger {
+  id               String   @id @default(cuid())
+  studentProfileId String
+  sessionId        String   @unique
+  points           Int
+  createdAt        DateTime @default(now())
+
+  session InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  student StudentProfile   @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+
+  @@index([studentProfileId])
+}
+
 model InterviewSession {
   id               String        @id @default(cuid())
   studentProfileId String
@@ -315,6 +362,69 @@ model InterviewSession {
 
   student StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
 
+  ledger ArenaPointLedger?
+
   @@index([studentProfileId])
   @@index([type])
+}
+
+// ---------- Announcements & notifications ----------
+
+enum AnnouncementCategory {
+  GENERAL
+  MEETING
+  INTERVIEW
+  DEADLINE
+  UPDATE
+}
+
+enum AnnouncementAudience {
+  ALL
+  APPLIED
+  SHORTLISTED
+  INTERVIEW_SELECTED
+}
+
+/// A staff-published notice. Recipients are materialized as
+/// AnnouncementRecipient rows at publish time, so the audience is frozen to
+/// whoever matched then — later signups or status changes do not alter it.
+model Announcement {
+  id         String                @id @default(cuid())
+  title      String
+  message    String
+  category   AnnouncementCategory  @default(GENERAL)
+  isUrgent   Boolean               @default(false)
+  audience   AnnouncementAudience
+  authorId   String
+  companyId  String?
+  jobId      String?
+  eventAt    DateTime?
+  venue      String?
+  meetingUrl String?
+  createdAt  DateTime              @default(now())
+
+  author     User                  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  company    Company?              @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  job        JobOpportunity?       @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  recipients AnnouncementRecipient[]
+
+  @@index([authorId])
+  @@index([jobId])
+  @@index([createdAt])
+}
+
+/// One student's copy of an announcement. readAt null means unread.
+model AnnouncementRecipient {
+  id           String   @id @default(cuid())
+  announcementId String
+  studentProfileId String
+  readAt       DateTime?
+  createdAt    DateTime @default(now())
+
+  announcement Announcement   @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  student      StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, studentProfileId])
+  @@index([studentProfileId])
+  @@index([announcementId])
 }

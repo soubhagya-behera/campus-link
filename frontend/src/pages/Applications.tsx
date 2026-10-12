@@ -23,6 +23,8 @@ export default function Applications() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["applications"] });
       void qc.invalidateQueries({ queryKey: ["readiness"] });
+      void qc.invalidateQueries({ queryKey: ["staff-applications"] });
+      void qc.invalidateQueries({ queryKey: ["tower"] });
     },
   });
 

@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, CalendarClock, Crosshair, ListChecks, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Badge, Card, DemoTag, ErrorState, Loading, Meter, Ring, SectionTitle } from "../components/ui";
 import { ApiError } from "../lib/server";
 import { useApplications, useMatches, useProfile, useProfileId, useReadiness, useSessionUser } from "../store/session";
@@ -25,27 +25,22 @@ export default function Dashboard() {
   const [flash, setFlash] = useState<{ jobId: string; kind: "ok" | "dup" | "error"; message?: string } | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
 
-  // Placement and recruiter accounts own no student profile, so the overview
-  // below can never load for them. Say so plainly instead of spinning forever.
+  // /app is the student overview. Placement staff land on their own
+  // overview instead; recruiter accounts get an explicit unavailable-portal
+  // state (no recruiter portal exists in this build) rather than student nav.
   if (user && !user.studentProfileId) {
+    if (user.role === "STAFF" || user.role === "ADMIN") {
+      return <Navigate to="/tower" replace />;
+    }
     return (
       <div>
-        <SectionTitle kicker="Student overview" title="No student workspace here" right={<DemoTag />} />
+        <SectionTitle kicker="Overview" title="Recruiter portal unavailable" right={<DemoTag />} />
         <Card className="p-6">
           <p className="text-sm leading-relaxed text-slate-300">
             This account is signed in as <span className="font-semibold text-white">{user.email}</span> with
-            the {user.role} role, which is not linked to a student profile.{" "}
-            {user.role === "STAFF" || user.role === "ADMIN" ? (
-              <>
-                Your view of the batch lives in the{" "}
-                <Link to="/tower" className="font-semibold text-signal-300 hover:text-signal-400">
-                  Placement Tower
-                </Link>
-                .
-              </>
-            ) : (
-              "Ask your placement cell to link this account to a student profile."
-            )}
+            the recruiter role. There is no recruiter portal in this build — recruiter workflows
+            (own-company drives and applicant review) are API-only. Ask your placement cell for
+            assistance.
           </p>
         </Card>
       </div>
@@ -92,6 +87,8 @@ export default function Dashboard() {
       setFlash({ jobId, kind: "ok" });
       await qc.invalidateQueries({ queryKey: ["applications"] });
       await qc.invalidateQueries({ queryKey: ["readiness"] });
+      await qc.invalidateQueries({ queryKey: ["staff-applications"] });
+      await qc.invalidateQueries({ queryKey: ["tower"] });
     } catch (e) {
       if (e instanceof ApiError && e.status === 409) {
         setFlash({ jobId, kind: "dup" });

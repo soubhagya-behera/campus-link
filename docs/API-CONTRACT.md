@@ -111,7 +111,9 @@ suggest a hardcoded identity authenticates a caller. The demo seed user
 provisioned; it confers nothing by itself.
 
 ### Students & Career Twin (🔒; STAFF/ADMIN = placement)
-- `GET /api/students` 🔒 STAFF/ADMIN → profile summaries (**no emails**).
+- `GET /api/students` 🔒 STAFF/ADMIN → profile summaries with account email and
+  record creation date (placement-only; never passwords or hashes). Search covers
+  name, roll number and email; filter by branch.
 - `GET /api/students/:id` 🔒 owner or placement (recruiters: 403 — use
   job-scoped candidate views) → profile + `skills: [{ skill, level, evidence:
   [projectId] }]` + projects. Levels are self-reported until linked evidence
@@ -119,6 +121,9 @@ provisioned; it confers nothing by itself.
 - `PATCH /api/students/:id/skills` 🔒 owner or placement.
   `{ skills: [{ skill ≤60ch, level }] }` (1–30 items, case-insensitive
   dedupe) → `{ updated }`. Creates unknown skill names; transactional.
+- `PATCH /api/students/:id/skills/:skillId` 🔒 owner or placement →
+  rename and/or re-level one skill; duplicate names 409. `DELETE …/skills/:skillId`
+  removes only the link row — projects, attempts and sessions survive.
 - `POST /api/students/:id/projects` 🔒 owner or placement.
   `{ title 3–120, description ≤2000, url (valid URL), skills[] ≤15 }` → 201
   project. Named skills are created (BEGINNER) if missing so evidence links
@@ -189,6 +194,15 @@ provisioned; it confers nothing by itself.
 - `GET /api/arena/sessions` 🔒 owner or placement (recruiters 403);
   `GET /api/arena/sessions/:id` 🔒 same ownership rule → sessions with
   score/feedback (null until answered).
+- Question bank 🔒 STAFF/ADMIN: `GET/POST /api/arena/bank`,
+  `PATCH/DELETE /api/arena/bank/:id`. Delete is 409 while any session
+  references the question; deactivation preserves history. `GET /api/prompts`
+  serves active managed questions, falling back to the static bank while empty.
+- Practice points: `floor(score/10)` (0–10), stored per session in a ledger
+  row keyed by session — re-grading updates it, never duplicates. Answers
+  responses include `pointsEarned` + `totalPoints`; session lists include the
+  owner's total. `GET /api/arena/activity` 🔒 STAFF/ADMIN → sessions with
+  student, answers, score and points (filters: student, type, question).
 
 ### Placement Tower (🔒 STAFF/ADMIN only)
 - `GET /api/tower/stats` → `{ students, openOpportunities (status OPEN),
@@ -201,6 +215,17 @@ provisioned; it confers nothing by itself.
   `demo.`) are flagged, never presented as outcomes.
 - What-If Lab: intentionally client-side illustrative arithmetic; no server
   endpoint (a server copy would add no trust without validated outcome data).
+
+### Announcements & notifications
+- `POST /api/announcements` 🔒 STAFF/ADMIN → validates, resolves recipients
+  from live records (ALL = all profiles; APPLIED/SHORTLISTED literal;
+  INTERVIEW_SELECTED = HIRED), materializes recipient rows in one transaction;
+  422 on empty audience. `GET /api/announcements` 🔒 placement → history with
+  recipient/unread counts. `GET /api/announcements/recipients/preview` 🔒
+  placement → count only.
+- `GET /api/notifications`, `/unread-count` 🔒 student-own only.
+  `POST /api/notifications/:id/read`, `/read-all` 🔒 caller-scoped; cross-user
+  reads are 403. In-app only — no email/SMS/push.
 
 ## Business rules & formulas
 

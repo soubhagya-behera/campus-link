@@ -82,3 +82,26 @@ export function promptIdsValid(ids: string[]): boolean {
   const known = new Set(ARENA_PROMPTS.map((p) => p.id));
   return ids.length > 0 && ids.length <= 5 && ids.every((id) => known.has(id));
 }
+
+/** Staff-managed categories — the same three the static bank always used. */
+export const ARENA_CATEGORIES = ["Behavioral", "Technical", "Situational"] as const;
+
+/**
+ * Prompt ids valid for a new session: the static bank plus every active
+ * database question. Static ids stay accepted so existing history keeps
+ * working after staff edits or deactivations.
+ */
+export function promptIdsValidWith(ids: string[], managedIds: string[]): boolean {
+  const known = new Set([...ARENA_PROMPTS.map((p) => p.id), ...managedIds]);
+  return ids.length > 0 && ids.length <= 5 && ids.every((id) => known.has(id));
+}
+
+/**
+ * Practice points, derived server-side from the graded score — never accepted
+ * from the client. floor(score/10) on 0–100, so a perfect round earns 10.
+ * Documented here so the UI, tests and staff screens can never disagree.
+ */
+export function pointsForScore(score: number): number {
+  if (!Number.isFinite(score) || score <= 0) return 0;
+  return Math.max(0, Math.min(10, Math.floor(score / 10)));
+}

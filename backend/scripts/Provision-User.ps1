@@ -35,10 +35,13 @@ if ($pw1 -cne $pw2) { Write-Error "Passwords do not match. Nothing was created."
 $env:PROVISION_PASSWORD = $pw1
 $pw1 = $null; $pw2 = $null
 try {
-  $args = @("scripts/provision-user.ts", "--email", $Email, "--role", $Role)
-  if ($StudentProfileId) { $args += @("--student-profile-id", $StudentProfileId) }
-  if ($CompanyId) { $args += @("--company-id", $CompanyId) }
-  npx tsx @args
+  # NOTE: never collect these into $args — splatting the automatic $args
+  # variable passes zero arguments to native commands, which reduces
+  # `npx tsx` to a bare Node REPL instead of running the provisioning CLI.
+  $tsxArgs = @("scripts/provision-user.ts", "--email", $Email, "--role", $Role)
+  if ($StudentProfileId) { $tsxArgs += @("--student-profile-id", $StudentProfileId) }
+  if ($CompanyId) { $tsxArgs += @("--company-id", $CompanyId) }
+  npx tsx @tsxArgs
   if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 } finally {
   $env:PROVISION_PASSWORD = $null

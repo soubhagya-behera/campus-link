@@ -17,18 +17,70 @@ export default function CareerTwin() {
   const [newSkill, setNewSkill] = useState("");
   const [proj, setProj] = useState({ title: "", url: "", skills: "" });
   const [notice, setNotice] = useState<string | null>(null);
+  const [fault, setFault] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editLevel, setEditLevel] = useState<Level>("BEGINNER");
+  const [busyId, setBusyId] = useState<string | null>(null);
 
   const saveSkills = useMutation({
     mutationFn: (skills: { skill: string; level: Level }[]) => api.updateSkills(profileId as string, skills),
     onSuccess: () => {
-      setNotice("Skill levels saved to PostgreSQL.");
-      void qc.invalidateQueries({ queryKey: ["profile"] });
-      void qc.invalidateQueries({ queryKey: ["readiness"] });
-      void qc.invalidateQueries({ queryKey: ["matches"] });
+      setNotice("Skill levels saved.");
+      refreshSkills();
     },
-    onError: (e) => setNotice(e instanceof Error ? e.message : "Save failed"),
+    onError: (e) => setFault(e instanceof Error ? e.message : "Save failed"),
   });
+
+  function refreshSkills(): void {
+    void qc.invalidateQueries({ queryKey: ["profile"] });
+    void qc.invalidateQueries({ queryKey: ["readiness"] });
+    void qc.invalidateQueries({ queryKey: ["matches"] });
+  }
+
+  /** Runs one skill mutation with busy guard + error funnel. */
+  async function runSkill(id: string, fn: () => Promise<unknown>, done: string): Promise<void> {
+    if (!profileId || busyId) return;
+    setBusyId(id);
+    setFault(null);
+    try {
+      await fn();
+      setEditingId(null);
+      setNotice(done);
+      refreshSkills();
+    } catch (e) {
+      setFault(e instanceof ApiError ? e.message : "Could not save this skill.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  const startEdit = (id: string, name: string, level: Level) => {
+    setEditingId(id);
+    setEditName(name);
+    setEditLevel(level);
+    setFault(null);
+    setNotice(null);
+  };
+
+  const saveEdit = (id: string) => {
+    const name = editName.trim();
+    if (!name) {
+      setFault("Skill name cannot be empty.");
+      return;
+    }
+    if (profile.data?.skills.some((x) => x.id !== id && x.skill.toLowerCase() === name.toLowerCase())) {
+      setFault("That skill is already recorded — adjust its level instead.");
+      return;
+    }
+    void runSkill(id, () => api.updateSkill(profileId as string, id, { name, level: editLevel }), "Skill updated.");
+  };
+
+  const removeSkill = (id: string, name: string) => {
+    if (!window.confirm(`Remove "${name}" from your recorded skills? Projects and history are kept.`)) return;
+    void runSkill(id, () => api.deleteSkill(profileId as string, id), `Removed "${name}". Linked projects are untouched.`);
+  };
 
   const addSkill = () => {
     const name = newSkill.trim();
@@ -110,8 +162,13 @@ export default function CareerTwin() {
       />
 
       {notice && (
-        <p className="mb-4 rounded-xl border border-signal-500/30 bg-signal-400/[0.07] p-3 text-sm text-signal-200">
+        <p role="status" className="mb-4 rounded-xl border border-signal-500/30 bg-signal-400/[0.07] p-3 text-sm text-signal-200">
           {notice}
+        </p>
+      )}
+      {fault && (
+        <p role="alert" className="mb-4 rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200">
+          {fault}
         </p>
       )}
 
@@ -123,37 +180,93 @@ export default function CareerTwin() {
           <ul className="mt-3 space-y-2">
             {data.skills.map((s) => (
               <li
-                key={s.skill}
+                key={s.id}
                 className="flex flex-wrap items-center gap-2 rounded-xl border border-white/8 bg-white/[0.02] p-3"
               >
-                <span className="min-w-32 font-semibold text-white">{s.skill}</span>
-                {s.evidence.length > 0 ? (
-                  <Badge tone="signal">
-                    <BadgeCheck size={11} /> evidenced ×{s.evidence.length}
-                  </Badge>
+                {editingId === s.id ? (
+                  <>
+                    <input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      maxLength={60}
+                      aria-label="Skill name"
+                      className="min-w-32 flex-1 rounded-lg border border-white/10 bg-ink-800 px-2 py-1 text-sm font-semibold text-white"
+                    />
+                    <select
+                      value={editLevel}
+                      onChange={(e) => setEditLevel(e.target.value as Level)}
+                      aria-label={`Level for ${s.skill}`}
+                      className="rounded-lg border border-white/10 bg-ink-800 px-2 py-1 text-sm text-white"
+                    >
+                      {LEVELS.map((l) => (
+                        <option key={l}>{l}</option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={() => void saveEdit(s.id)}
+                      disabled={busyId !== null}
+                      className="rounded-lg bg-signal-400 px-2.5 py-1 text-xs font-semibold text-ink-950 hover:bg-signal-300 disabled:opacity-50"
+                    >
+                      {busyId === s.id ? "Saving…" : "Save"}
+                    </button>
+                    <button
+                      onClick={() => setEditingId(null)}
+                      disabled={busyId !== null}
+                      className="rounded-lg border border-white/10 px-2.5 py-1 text-xs text-slate-400 hover:text-white disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                  </>
                 ) : (
-                  <Badge tone="amber">
-                    <CircleAlert size={11} /> claimed · unproven
-                  </Badge>
+                  <>
+                    <span className="min-w-32 font-semibold text-white">{s.skill}</span>
+                    {s.evidence.length > 0 ? (
+                      <Badge tone="signal">
+                        <BadgeCheck size={11} /> evidenced ×{s.evidence.length}
+                      </Badge>
+                    ) : (
+                      <Badge tone="amber">
+                        <CircleAlert size={11} /> claimed · unproven
+                      </Badge>
+                    )}
+                    <span className="ml-auto inline-flex items-center gap-1.5">
+                      <select
+                        value={s.level}
+                        disabled={saveSkills.isPending || busyId !== null}
+                        onChange={(e) =>
+                          saveSkills.mutate(
+                            data.skills.map((x) => ({
+                              skill: x.skill,
+                              level: (x.skill === s.skill ? (e.target.value as Level) : x.level),
+                            })),
+                          )
+                        }
+                        className="rounded-lg border border-white/10 bg-ink-800 px-2 py-1 text-sm text-white"
+                        aria-label={`Recorded level for ${s.skill}`}
+                      >
+                        {LEVELS.map((l) => (
+                          <option key={l}>{l}</option>
+                        ))}
+                      </select>
+                      <button
+                        onClick={() => startEdit(s.id, s.skill, s.level)}
+                        disabled={saveSkills.isPending || busyId !== null}
+                        aria-label={`Rename ${s.skill}`}
+                        className="rounded-lg border border-white/10 px-2 py-1 text-xs text-slate-400 hover:text-white disabled:opacity-50"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => void removeSkill(s.id, s.skill)}
+                        disabled={saveSkills.isPending || busyId !== null}
+                        aria-label={`Remove ${s.skill}`}
+                        className="rounded-lg border border-white/10 px-2 py-1 text-xs text-slate-400 hover:text-white disabled:opacity-50"
+                      >
+                        {busyId === s.id ? "…" : "Delete"}
+                      </button>
+                    </span>
+                  </>
                 )}
-                <select
-                  value={s.level}
-                  disabled={saveSkills.isPending}
-                  onChange={(e) =>
-                    saveSkills.mutate(
-                      data.skills.map((x) => ({
-                        skill: x.skill,
-                        level: (x.skill === s.skill ? (e.target.value as Level) : x.level),
-                      })),
-                    )
-                  }
-                  className="ml-auto rounded-lg border border-white/10 bg-ink-800 px-2 py-1 text-sm text-white"
-                  aria-label={`Recorded level for ${s.skill}`}
-                >
-                  {LEVELS.map((l) => (
-                    <option key={l}>{l}</option>
-                  ))}
-                </select>
               </li>
             ))}
             {data.skills.length === 0 && (

@@ -6,16 +6,38 @@ import {
   ARENA_METHOD,
   ARENA_PROMPTS,
   gradeAnswer,
-  promptIdsValid,
+  pointsForScore,
+  promptIdsValidWith,
 } from "../lib/arena.js";
 import { parsePaging, sendInvalid } from "../lib/validate.js";
 import { requireAuth, resolveStudentScope } from "../lib/auth.js";
 
 const router = Router();
 
-/** GET /api/arena/prompts — any authenticated user. */
-router.get("/prompts", requireAuth, (_req, res) => {
-  res.json({ ok: true, version: ARENA_BANK_VERSION, method: ARENA_METHOD, data: ARENA_PROMPTS });
+/**
+ * GET /api/arena/prompts — any authenticated user. Staff-managed active
+ * questions; the static curated bank only while the table is still empty.
+ */
+router.get("/prompts", requireAuth, async (_req, res, next) => {
+  try {
+    const rows = await prisma.arenaPrompt.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: "asc" },
+    });
+    if (rows.length === 0) {
+      res.json({ ok: true, version: ARENA_BANK_VERSION, method: ARENA_METHOD, source: "static", data: ARENA_PROMPTS });
+      return;
+    }
+    res.json({
+      ok: true,
+      version: ARENA_BANK_VERSION,
+      method: ARENA_METHOD,
+      source: "database",
+      data: rows.map((p) => ({ id: p.id, category: p.category, prompt: p.prompt, hint: p.hint ?? "" })),
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 const createBody = z.object({
@@ -40,7 +62,11 @@ router.post("/sessions", requireAuth, async (req, res, next) => {
     const { type, promptIds } = parsed.data;
     const profile = await prisma.studentProfile.findUnique({ where: { id: studentProfileId } });
     if (!profile) return res.status(404).json({ ok: false, error: "Student profile not found" });
-    if (!promptIdsValid(promptIds)) {
+    const managed = await prisma.arenaPrompt.findMany({
+      where: { isActive: true },
+      select: { id: true },
+    });
+    if (!promptIdsValidWith(promptIds, managed.map((p) => p.id))) {
       return res.status(400).json({ ok: false, error: "Unknown or duplicate prompt ids (see GET /api/arena/prompts)" });
     }
     const session = await prisma.interviewSession.create({
@@ -115,7 +141,20 @@ router.post("/sessions/:id/answers", requireAuth, async (req, res, next) => {
         score,
       },
     });
-    res.json({ ok: true, method: ARENA_METHOD, bankVersion: ARENA_BANK_VERSION, data: updated });
+    // One ledger row per session: re-grading updates it, so retries can never
+    // mint duplicate rewards. Points derive from the server score only.
+    const pointsEarned = pointsForScore(score);
+    await prisma.arenaPointLedger.upsert({
+      where: { sessionId: session.id },
+      update: { points: pointsEarned },
+      create: { studentProfileId: session.studentProfileId, sessionId: session.id, points: pointsEarned },
+    });
+    const ledger = await prisma.arenaPointLedger.findMany({
+      where: { studentProfileId: session.studentProfileId },
+      select: { points: true },
+    });
+    const totalPoints = ledger.reduce((s, l) => s + l.points, 0);
+    res.json({ ok: true, method: ARENA_METHOD, bankVersion: ARENA_BANK_VERSION, data: updated, pointsEarned, totalPoints });
   } catch (err) {
     next(err);
   }
@@ -144,7 +183,16 @@ router.get("/sessions", requireAuth, async (req, res, next) => {
         take: limit,
       }),
     ]);
-    res.json({ ok: true, method: ARENA_METHOD, data: rows, page, limit, total });
+    // Students see their own accumulated practice points alongside history.
+    let totalPoints: number | null = null;
+    if (req.auth?.role === "STUDENT" && studentProfileId) {
+      const ledger = await prisma.arenaPointLedger.findMany({
+        where: { studentProfileId },
+        select: { points: true },
+      });
+      totalPoints = ledger.reduce((s, l) => s + l.points, 0);
+    }
+    res.json({ ok: true, method: ARENA_METHOD, data: rows, page, limit, total, totalPoints });
   } catch (err) {
     next(err);
   }

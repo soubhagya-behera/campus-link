@@ -3,7 +3,12 @@ import { CheckCircle2, Mic, RotateCcw, Send } from "lucide-react";
 import { useState } from "react";
 import { Badge, Card, DemoTag, Empty, ErrorState, Loading, NoStudentState, SectionTitle } from "../components/ui";
 import { cn } from "../lib/cn";
-import { ApiError, api, type ArenaSession } from "../lib/server";
+import { ApiError } from "../lib/server";
+import {
+  createArenaSession,
+  submitArenaAnswers,
+  type ArenaSession,
+} from "../lib/arena";
 import { useArenaPrompts, useArenaSessions, useProfileId, useSessionUser } from "../store/session";
 
 /** Server session types per prompt category (backend enum HR/TECHNICAL/MANAGERIAL/MOCK). */
@@ -63,6 +68,7 @@ export default function InterviewArena() {
   const [answer, setAnswer] = useState("");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [earned, setEarned] = useState<{ points: number; total: number } | null>(null);
 
   // Unconditional: hooks must run in the same order on every render, so the
   // mutation lives above the loading/error/empty early returns below.
@@ -73,7 +79,7 @@ export default function InterviewArena() {
       // but grading failed; otherwise each round gets a fresh persisted row.
       let sid = sessionId;
       if (!sid) {
-        const created = await api.createArenaSession({
+        const created = await createArenaSession({
           studentProfileId: profileId,
           type: TYPE_FOR_CATEGORY[input.category] ?? "MOCK",
           promptIds: [input.promptId],
@@ -81,11 +87,13 @@ export default function InterviewArena() {
         sid = created.id;
         setSessionId(sid);
       }
-      return api.submitArenaAnswers(sid, [{ promptId: input.promptId, text: input.text }]);
+      return submitArenaAnswers(sid, [{ promptId: input.promptId, text: input.text }]);
     },
-    onSuccess: () => {
+    onSuccess: (r) => {
       setError(null);
       setSessionId(null);
+      // Points come from the server response only — never computed locally.
+      setEarned({ points: r.pointsEarned, total: r.totalPoints });
       void qc.invalidateQueries({ queryKey: ["arena-sessions"] });
     },
     onError: (e) => setError(e instanceof ApiError ? e.message : "Submission failed"),
@@ -154,12 +162,14 @@ export default function InterviewArena() {
     setAnswer("");
     setSessionId(null);
     setError(null);
+    setEarned(null);
   };
 
   const newRound = () => {
     setAnswer("");
     setSessionId(null);
     setError(null);
+    setEarned(null);
   };
 
   const select = (id: string) => {
@@ -172,6 +182,7 @@ export default function InterviewArena() {
     setActiveId(id);
     setError(null);
     setSessionId(null);
+    setEarned(null);
     const last = sessions.find((s) => sessionPromptIds(s).includes(id));
     setAnswer(savedAnswer(last));
   };
@@ -213,7 +224,7 @@ export default function InterviewArena() {
           </button>
         ))}
         <span className="ml-auto inline-flex items-center gap-1.5 font-mono text-[11px] text-slate-500">
-          <Mic size={12} /> {rounds} persisted round{rounds === 1 ? "" : "s"}
+          <Mic size={12} /> {rounds} persisted round{rounds === 1 ? "" : "s"} · {history.data?.totalPoints ?? 0} pts
         </span>
       </div>
 
@@ -314,6 +325,7 @@ export default function InterviewArena() {
               <p className="mt-3 font-mono text-[11px] text-slate-500">
                 Persisted round · {latest.createdAt.slice(0, 10)}
                 {prior.length > 1 ? ` · ${prior.length} rounds on this prompt` : ""}
+                {earned ? ` · +${earned.points} pts earned (${earned.total} total)` : ""}
               </p>
             </Card>
           )}
