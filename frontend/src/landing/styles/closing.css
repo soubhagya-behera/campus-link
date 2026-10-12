@@ -253,6 +253,38 @@
   pointer-events: none;
 }
 
+/* ────────────────────────────────────────── phone width (≤620px) ──────── */
+
+@media (max-width: 620px) {
+  /* The trace measure leaves a dead column at phone widths. */
+  .cl-trace p {
+    max-width: none;
+  }
+  /* Reclaim width for the two-up board and the CTA panel. */
+  .cl-placement-board {
+    padding: 0.95rem;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+  .cl-placement-cell {
+    padding: 0.7rem;
+    min-width: 0;
+  }
+  .cl-cta {
+    padding: 1.6rem 1.15rem;
+  }
+  /* Trim the record panel's inner padding so rows use more of the
+     reclaimed gutter width; panel keeps its border and hierarchy. */
+  .cl-record {
+    min-width: 0;
+  }
+  .cl-record-bar,
+  .cl-record-row,
+  .cl-record-foot {
+    padding-inline: 0.85rem;
+  }
+}
+
 /* ───────────────────────────────────────────────────────────── footer ──── */
 
 .cl-foot {

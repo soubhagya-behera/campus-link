@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import JobCard from "./JobCard";
 import { DemoTag, Empty, ErrorState, Loading, NoStudentState, SectionTitle } from "../components/ui";
+import "../components/student.css";
 import { ApiError, api } from "../lib/server";
 import { useApplications, useMatches, useProfileId, useSessionUser } from "../store/session";
 
@@ -72,7 +73,7 @@ export default function OpportunityMirror() {
   const apps = applications.data ?? [];
 
   return (
-    <div>
+    <div className="sw sw-enter">
       <SectionTitle
         kicker="Opportunity Mirror"
         title="Ranked by fit, explained in plain words"

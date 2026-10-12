@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import { nextActions } from "./ApplicationReview";
 import ApplicantEvidence from "./ApplicantEvidence";
 import { Badge, Card, DemoTag, ErrorState, Loading, SectionTitle } from "../components/ui";
+import "../components/staff.css";
 import { ApiError, api } from "../lib/server";
 import { arenaSessions } from "../lib/arena";
 import { isPlacement, useSessionUser } from "../store/session";
@@ -182,7 +183,7 @@ export default function ApplicantReview() {
   };
 
   return (
-    <div>
+    <div className="st st-enter">
       <SectionTitle
         kicker="Applicant review"
         title={`${app.student?.fullName ?? "Applicant"} · ${app.job.title}`}
@@ -191,7 +192,7 @@ export default function ApplicantReview() {
       />
       <Link
         to="/tower#applications"
-        className="mb-4 inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-4 py-2 text-sm font-semibold text-[var(--ws-forest)]"
+        className="st-btn-secondary mb-4 inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-4 py-2 text-sm font-semibold text-[var(--ws-forest)]"
       >
         <ArrowLeft size={14} aria-hidden="true" /> Back to applications
       </Link>
@@ -209,7 +210,7 @@ export default function ApplicantReview() {
 
       {/* Summary: two columns until very wide screens — three squeezed cards help nobody. */}
       <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
-        <Card className="p-5">
+        <Card className="st-card p-5">
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--ws-faint)]">Candidate</p>
           <p className="font-display mt-1 text-xl font-bold text-[var(--ws-ink)]">{app.student?.fullName ?? "—"}</p>
           <p className="mt-1 text-sm text-[var(--ws-mute)]">
@@ -225,7 +226,7 @@ export default function ApplicantReview() {
                 key={to}
                 onClick={() => void decide(to)}
                 disabled={pending !== null}
-                className="inline-flex min-h-[44px] items-center rounded-lg border border-[var(--ws-forest)] px-3 py-2 text-xs font-semibold text-[var(--ws-forest)] disabled:opacity-50"
+                className={to === "REJECTED" ? "st-btn-danger inline-flex min-h-[44px] items-center rounded-lg border px-3 py-2 text-xs font-semibold disabled:opacity-50" : "st-btn-secondary inline-flex min-h-[44px] items-center rounded-lg border border-[var(--ws-forest)] px-3 py-2 text-xs font-semibold text-[var(--ws-forest)] disabled:opacity-50"}
               >
                 {pending === to ? "Saving…" : to === "HIRED" ? "Mark hired" : to === "SHORTLISTED" ? "Shortlist" : "Reject"}
               </button>
@@ -236,7 +237,7 @@ export default function ApplicantReview() {
           </div>
         </Card>
 
-        <Card className="p-5">
+        <Card className="st-card p-5">
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--ws-faint)]">Readiness</p>
           {ready ? (
             <>
@@ -267,7 +268,7 @@ export default function ApplicantReview() {
           )}
         </Card>
 
-        <Card className="p-5">
+        <Card className="st-card p-5">
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--ws-faint)]">
             Job fit · {app.job.title}
           </p>

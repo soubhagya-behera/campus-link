@@ -1,0 +1,293 @@
+@import "./student-tokens.css";
+
+/* ============================================================================
+   Staff placement workspace interaction system (.st scope — staff pages only).
+   Student pages (.sw/.db), landing (.cl) and auth never match .st, so they
+   are unaffected. Same three-level language: calm surfaces, hover halo+lift,
+   glowing primaries. Transform/opacity/shadow only; lifts never move
+   siblings; everything collapses under prefers-reduced-motion.
+   ========================================================================= */
+
+.st {
+  --sw-line: var(--ws-line, #dde2d8);
+  --sw-line-soft: var(--ws-line-soft, #e9ece3);
+  --sw-surface: var(--ws-surface, #ffffff);
+  --sw-ink: var(--ws-ink, #202822);
+  --sw-mute: var(--ws-mute, #4f5c50);
+  --sw-faint: var(--ws-faint, #5f7160);
+  --sw-forest: var(--ws-forest, #173c2f);
+  --sw-lime: var(--ws-lime, #c5e86c);
+  --sw-lime-ink: var(--ws-lime-ink, #3f5417);
+  --sw-err: var(--ws-err, #9b3226);
+  --sw-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --sw-t-fast: 140ms;
+  --sw-t-mid: 280ms;
+  --sw-shadow-rest:
+    0 1px 2px rgb(32 40 34 / 0.05),
+    0 10px 28px -18px rgb(32 40 34 / 0.28);
+  --sw-shadow-hover:
+    0 2px 4px rgb(32 40 34 / 0.05),
+    0 22px 44px -20px rgb(23 60 47 / 0.4),
+    0 0 0 1px rgb(197 232 108 / 0.35),
+    0 10px 40px -12px rgb(197 232 108 / 0.4);
+  --sw-btn-glow:
+    0 8px 20px -10px rgb(23 60 47 / 0.5),
+    0 0 0 1px rgb(197 232 108 / 0.4),
+    0 0 18px -6px rgb(197 232 108 / 0.55);
+  --sw-btn-glow-hover:
+    0 14px 30px -12px rgb(23 60 47 / 0.55),
+    0 0 0 1px rgb(197 232 108 / 0.65),
+    0 0 30px -6px rgb(197 232 108 / 0.65);
+}
+
+/* ── Page entry ───────────────────────────────────────────────────────── */
+
+.st-enter {
+  animation: st-enter 0.45s var(--sw-ease) both;
+}
+@keyframes st-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Cards & rows ─────────────────────────────────────────────────────── */
+
+.st-card,
+.st-lift {
+  transition:
+    transform var(--sw-t-mid) var(--sw-ease),
+    box-shadow var(--sw-t-mid) var(--sw-ease),
+    border-color var(--sw-t-fast) linear,
+    background-color var(--sw-t-fast) linear;
+}
+
+.st-card {
+  position: relative;
+  box-shadow: var(--sw-shadow-rest);
+}
+
+.st-card::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 1.25rem;
+  right: 1.25rem;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--sw-lime) 35%, var(--sw-lime) 65%, transparent);
+  opacity: 0;
+  transform: scaleX(0.5);
+  transition:
+    opacity var(--sw-t-mid) var(--sw-ease),
+    transform var(--sw-t-mid) var(--sw-ease);
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .st-card:hover,
+  .st-lift:hover {
+    transform: translate3d(0, -4px, 0);
+    border-color: rgb(63 84 23 / 0.45);
+    box-shadow: var(--sw-shadow-hover);
+  }
+  .st-card:hover::before {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+/* ── Primary buttons (lime) + forest operational buttons ──────────────── */
+
+.st-btn,
+.st-btn-forest {
+  min-height: 44px;
+  transition:
+    background-color var(--sw-t-fast) linear,
+    box-shadow var(--sw-t-mid) var(--sw-ease),
+    transform 140ms var(--sw-ease);
+}
+
+.st-btn {
+  box-shadow: var(--sw-btn-glow);
+}
+
+.st-btn-forest {
+  box-shadow:
+    0 8px 20px -12px rgb(23 60 47 / 0.55),
+    0 0 0 1px rgb(23 60 47 / 0.2);
+}
+
+.st-btn svg,
+.st-btn-forest svg {
+  transition: transform var(--sw-t-mid) var(--sw-ease);
+}
+
+@media (hover: hover) {
+  .st-btn:hover:not(:disabled) {
+    transform: translate3d(0, -2px, 0);
+    box-shadow: var(--sw-btn-glow-hover);
+  }
+  .st-btn:hover:not(:disabled) svg,
+  .st-btn-forest:hover:not(:disabled) svg {
+    transform: translateX(3px);
+  }
+  .st-btn-forest:hover:not(:disabled) {
+    transform: translate3d(0, -2px, 0);
+    box-shadow:
+      0 14px 28px -12px rgb(23 60 47 / 0.6),
+      0 0 0 1px rgb(197 232 108 / 0.5),
+      0 0 24px -8px rgb(197 232 108 / 0.5);
+  }
+}
+
+.st-btn:active:not(:disabled),
+.st-btn-forest:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* ── Secondary / destructive / links / tabs ───────────────────────────── */
+
+.st-btn-secondary {
+  min-height: 44px;
+  transition:
+    background-color var(--sw-t-fast) linear,
+    border-color var(--sw-t-fast) linear,
+    box-shadow var(--sw-t-mid) var(--sw-ease),
+    transform 140ms var(--sw-ease);
+}
+
+@media (hover: hover) {
+  .st-btn-secondary:hover:not(:disabled) {
+    transform: translate3d(0, -1px, 0);
+    background-color: #eef0ea;
+    box-shadow: 0 8px 18px -12px rgb(23 60 47 / 0.4);
+  }
+}
+
+.st-btn-danger {
+  min-height: 44px;
+  color: var(--sw-err);
+  border-color: #e8c6bf;
+  transition:
+    background-color var(--sw-t-fast) linear,
+    border-color var(--sw-t-fast) linear,
+    box-shadow var(--sw-t-mid) var(--sw-ease);
+}
+
+@media (hover: hover) {
+  .st-btn-danger:hover:not(:disabled) {
+    background-color: var(--ws-err-bg, #fbeeeb);
+    border-color: var(--sw-err);
+    box-shadow: 0 8px 18px -12px rgb(155 50 38 / 0.45);
+  }
+}
+
+.st-link {
+  border-radius: 4px;
+  transition: color var(--sw-t-fast) linear;
+}
+
+.st-link svg {
+  transition: transform var(--sw-t-mid) var(--sw-ease);
+}
+
+@media (hover: hover) {
+  .st-link:hover svg {
+    transform: translateX(3px);
+  }
+}
+
+.st-tab {
+  transition:
+    border-color var(--sw-t-fast) linear,
+    background-color var(--sw-t-fast) linear,
+    color var(--sw-t-fast) linear,
+    box-shadow var(--sw-t-mid) var(--sw-ease);
+}
+
+@media (hover: hover) {
+  .st-tab:hover:not(:disabled):not([aria-pressed="true"]) {
+    border-color: var(--sw-faint);
+    box-shadow: 0 6px 16px -10px rgb(23 60 47 / 0.35);
+  }
+}
+
+/* ── Form controls ────────────────────────────────────────────────────── */
+
+.st-input,
+.st-select,
+.st-textarea {
+  transition:
+    border-color var(--sw-t-fast) linear,
+    box-shadow var(--sw-t-fast) linear,
+    background-color var(--sw-t-fast) linear;
+}
+
+.st-input:hover:not(:disabled):not(:focus),
+.st-select:hover:not(:disabled):not(:focus),
+.st-textarea:hover:not(:disabled):not(:focus) {
+  border-color: var(--sw-faint);
+}
+
+.st-input:focus,
+.st-select:focus,
+.st-textarea:focus {
+  outline: none;
+  border-color: var(--sw-forest);
+  box-shadow: 0 0 0 3px rgb(197 232 108 / 0.28);
+}
+
+/* ── Focus language ───────────────────────────────────────────────────── */
+
+.st :focus-visible {
+  outline: 2px solid var(--sw-forest);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Reduced motion + small screens ───────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .st-enter {
+    animation: none;
+  }
+  .st-card,
+  .st-card::before,
+  .st-lift,
+  .st-btn,
+  .st-btn svg,
+  .st-btn-forest,
+  .st-btn-forest svg,
+  .st-btn-secondary,
+  .st-btn-danger,
+  .st-link,
+  .st-link svg,
+  .st-tab,
+  .st-input,
+  .st-select,
+  .st-textarea {
+    transition: none;
+    animation: none;
+  }
+  .st-card:hover,
+  .st-btn:hover:not(:disabled),
+  .st-btn-forest:hover:not(:disabled),
+  .st-btn-secondary:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .st-card:hover,
+  .st-lift:hover {
+    box-shadow:
+      0 2px 4px rgb(32 40 34 / 0.05),
+      0 14px 28px -18px rgb(23 60 47 / 0.35);
+  }
+}

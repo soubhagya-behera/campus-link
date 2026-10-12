@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, Mic, RotateCcw, Send } from "lucide-react";
 import { useState } from "react";
 import { Badge, Card, DemoTag, Empty, ErrorState, Loading, NoStudentState, SectionTitle } from "../components/ui";
+import "../components/student.css";
 import { cn } from "../lib/cn";
 import { ApiError } from "../lib/server";
 import {
@@ -200,7 +201,7 @@ export default function InterviewArena() {
   const feedback = (latest?.feedback ?? "").split("\n").filter(Boolean);
 
   return (
-    <div>
+    <div className="sw sw-enter">
       <SectionTitle
         kicker="Interview Arena"
         title="Reps, not tips"
@@ -214,7 +215,7 @@ export default function InterviewArena() {
             key={p.id}
             onClick={() => select(p.id)}
             className={cn(
-              "rounded-full border px-3.5 py-2 text-sm font-medium",
+              "sw-tab rounded-full border px-3.5 py-2 text-sm font-medium",
               p.id === active.id
                 ? "border-signal-500/50 bg-signal-400/10 text-signal-200"
                 : "border-white/10 text-slate-400 hover:text-white",
@@ -229,7 +230,7 @@ export default function InterviewArena() {
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <Card className="rise">
+        <Card className="rise sw-card">
           <Badge tone="sky">{active.category}</Badge>
           <p className="font-display mt-3 text-xl font-bold leading-snug text-white">“{active.prompt}”</p>
           <p className="mt-2 text-sm text-slate-400">Coach hint: {active.hint}</p>
@@ -243,7 +244,7 @@ export default function InterviewArena() {
             readOnly={submitted}
             placeholder="Type your answer as you'd speak it — 60 to 90 seconds…"
             aria-describedby="arena-answer-help"
-            className="mt-4 w-full rounded-xl border border-white/10 bg-ink-800 p-3 text-sm leading-relaxed text-white placeholder:text-slate-600"
+            className="sw-textarea mt-4 w-full rounded-xl border border-white/10 bg-ink-800 p-3 text-sm leading-relaxed text-white placeholder:text-slate-600"
           />
           <p id="arena-answer-help" className="mt-1.5 text-xs leading-relaxed text-slate-500">
             Minimum 10 words to submit · aim for 60–90 seconds spoken (≈130–200 words) for full
@@ -268,7 +269,7 @@ export default function InterviewArena() {
                   onClick={newRound}
                   disabled={submit.isPending}
                   title="Clear this answer and start a fresh attempt (no session is created until you submit)"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-signal-400 px-4 py-2 text-sm font-semibold text-ink-950 hover:bg-signal-300 disabled:opacity-50"
+                  className="sw-btn inline-flex items-center gap-1.5 rounded-lg bg-signal-400 px-4 py-2 text-sm font-semibold text-ink-950 hover:bg-signal-300 disabled:opacity-50"
                 >
                   <Send size={14} /> Practice another answer
                 </button>
@@ -277,7 +278,7 @@ export default function InterviewArena() {
               <button
                 onClick={trySubmit}
                 disabled={submit.isPending || wordCount(answer) < 10}
-                className="inline-flex items-center gap-2 rounded-lg bg-signal-400 px-4 py-2 text-sm font-semibold text-ink-950 hover:bg-signal-300 disabled:cursor-not-allowed disabled:opacity-40"
+                className="sw-btn inline-flex items-center gap-2 rounded-lg bg-signal-400 px-4 py-2 text-sm font-semibold text-ink-950 hover:bg-signal-300 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Send size={14} /> {submit.isPending ? "Grading…" : "Get feedback"}
               </button>
@@ -290,7 +291,7 @@ export default function InterviewArena() {
                   ? "This answer is already submitted — use Practice another answer for a new attempt"
                   : "Discard the current draft (saved rounds are kept)"
               }
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-400 hover:text-white disabled:opacity-50"
+              className="sw-btn-secondary inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-400 hover:text-white disabled:opacity-50"
             >
               <RotateCcw size={13} /> Reset
             </button>
@@ -305,7 +306,7 @@ export default function InterviewArena() {
               body="Submit an answer and the server scores it on substance, quantification, reasoning, and structure — the four things panels actually grade. Scored rounds stay on record."
             />
           ) : (
-            <Card className="rise">
+            <Card className="rise sw-card">
               <div className="flex items-center justify-between">
                 <p className="font-display text-3xl font-bold text-white">
                   {latest.score}

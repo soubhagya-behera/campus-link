@@ -3,6 +3,7 @@ import { ArrowRight, BadgeCheck, CircleAlert, Plus } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Card, DemoTag, Empty, ErrorState, Loading, NoStudentState, SectionTitle } from "../components/ui";
+import "../components/student.css";
 import { ApiError, api, type Level } from "../lib/server";
 import { useMatches, useProfile, useProfileId, useSessionUser } from "../store/session";
 
@@ -153,7 +154,7 @@ export default function CareerTwin() {
   }
 
   return (
-    <div>
+    <div className="sw sw-enter">
       <SectionTitle
         kicker="Career Twin"
         title="Your skill mirror"
@@ -173,7 +174,7 @@ export default function CareerTwin() {
       )}
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="rise lg:col-span-2">
+        <Card className="rise sw-card lg:col-span-2">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-500">
             Recorded skills · {data.skills.length}
           </p>
@@ -181,7 +182,7 @@ export default function CareerTwin() {
             {data.skills.map((s) => (
               <li
                 key={s.id}
-                className="flex flex-wrap items-center gap-2 rounded-xl border border-white/8 bg-white/[0.02] p-3"
+                className="sw-lift flex flex-wrap items-center gap-2 rounded-xl border border-white/8 bg-white/[0.02] p-3"
               >
                 {editingId === s.id ? (
                   <>
@@ -190,13 +191,13 @@ export default function CareerTwin() {
                       onChange={(e) => setEditName(e.target.value)}
                       maxLength={60}
                       aria-label="Skill name"
-                      className="min-w-32 flex-1 rounded-lg border border-white/10 bg-ink-800 px-2 py-1 text-sm font-semibold text-white"
+                      className="sw-input min-w-32 flex-1 rounded-lg border border-white/10 bg-ink-800 px-2 py-1 text-sm font-semibold text-white"
                     />
                     <select
                       value={editLevel}
                       onChange={(e) => setEditLevel(e.target.value as Level)}
                       aria-label={`Level for ${s.skill}`}
-                      className="rounded-lg border border-white/10 bg-ink-800 px-2 py-1 text-sm text-white"
+                      className="sw-select rounded-lg border border-white/10 bg-ink-800 px-2 py-1 text-sm text-white"
                     >
                       {LEVELS.map((l) => (
                         <option key={l}>{l}</option>
@@ -205,14 +206,14 @@ export default function CareerTwin() {
                     <button
                       onClick={() => void saveEdit(s.id)}
                       disabled={busyId !== null}
-                      className="rounded-lg bg-signal-400 px-2.5 py-1 text-xs font-semibold text-ink-950 hover:bg-signal-300 disabled:opacity-50"
+                      className="sw-btn rounded-lg bg-signal-400 px-2.5 py-1 text-xs font-semibold text-ink-950 hover:bg-signal-300 disabled:opacity-50"
                     >
                       {busyId === s.id ? "Saving…" : "Save"}
                     </button>
                     <button
                       onClick={() => setEditingId(null)}
                       disabled={busyId !== null}
-                      className="rounded-lg border border-white/10 px-2.5 py-1 text-xs text-slate-400 hover:text-white disabled:opacity-50"
+                      className="sw-btn-secondary rounded-lg border border-white/10 px-2.5 py-1 text-xs text-slate-400 hover:text-white disabled:opacity-50"
                     >
                       Cancel
                     </button>
@@ -241,7 +242,7 @@ export default function CareerTwin() {
                             })),
                           )
                         }
-                        className="rounded-lg border border-white/10 bg-ink-800 px-2 py-1 text-sm text-white"
+                        className="sw-select rounded-lg border border-white/10 bg-ink-800 px-2 py-1 text-sm text-white"
                         aria-label={`Recorded level for ${s.skill}`}
                       >
                         {LEVELS.map((l) => (
@@ -252,7 +253,7 @@ export default function CareerTwin() {
                         onClick={() => startEdit(s.id, s.skill, s.level)}
                         disabled={saveSkills.isPending || busyId !== null}
                         aria-label={`Rename ${s.skill}`}
-                        className="rounded-lg border border-white/10 px-2 py-1 text-xs text-slate-400 hover:text-white disabled:opacity-50"
+                        className="sw-btn-secondary rounded-lg border border-white/10 px-2 py-1 text-xs text-slate-400 hover:text-white disabled:opacity-50"
                       >
                         Edit
                       </button>
@@ -260,7 +261,7 @@ export default function CareerTwin() {
                         onClick={() => void removeSkill(s.id, s.skill)}
                         disabled={saveSkills.isPending || busyId !== null}
                         aria-label={`Remove ${s.skill}`}
-                        className="rounded-lg border border-white/10 px-2 py-1 text-xs text-slate-400 hover:text-white disabled:opacity-50"
+                        className="sw-btn-danger rounded-lg border border-white/10 px-2 py-1 text-xs text-slate-400 hover:text-white disabled:opacity-50"
                       >
                         {busyId === s.id ? "…" : "Delete"}
                       </button>
@@ -279,12 +280,12 @@ export default function CareerTwin() {
               onChange={(e) => setNewSkill(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addSkill()}
               placeholder="Add a skill, e.g. Docker"
-              className="flex-1 rounded-lg border border-white/10 bg-ink-800 px-3 py-2 text-sm text-white placeholder:text-slate-600"
+              className="sw-input flex-1 rounded-lg border border-white/10 bg-ink-800 px-3 py-2 text-sm text-white placeholder:text-slate-600"
             />
             <button
               onClick={addSkill}
               disabled={saveSkills.isPending}
-              className="inline-flex items-center gap-1 rounded-lg bg-signal-400 px-3 py-2 text-sm font-semibold text-ink-950 hover:bg-signal-300 disabled:opacity-50"
+              className="sw-btn inline-flex items-center gap-1 rounded-lg bg-signal-400 px-3 py-2 text-sm font-semibold text-ink-950 hover:bg-signal-300 disabled:opacity-50"
             >
               <Plus size={14} /> Record
             </button>
@@ -294,7 +295,7 @@ export default function CareerTwin() {
           </p>
         </Card>
 
-        <Card className="rise rise-1">
+        <Card className="rise rise-1 sw-card">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-500">
             Demanded by open roles
           </p>
@@ -320,7 +321,7 @@ export default function CareerTwin() {
           )}
           <Link
             to="/mirror"
-            className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-signal-300 hover:underline"
+            className="sw-link mt-3 inline-flex items-center gap-1 text-sm font-medium text-signal-300 hover:underline"
           >
             See which roles <ArrowRight size={14} />
           </Link>
@@ -330,7 +331,7 @@ export default function CareerTwin() {
       <h2 className="font-display mt-8 text-lg font-bold text-white">Evidence locker</h2>
       <div className="mt-3 grid gap-4 md:grid-cols-3">
         {data.projects.map((p) => (
-          <Card key={p.id}>
+          <Card key={p.id} className="sw-card">
             <p className="font-semibold text-white">{p.title}</p>
             {p.description && <p className="mt-1 text-sm text-slate-400">{p.description}</p>}
             <div className="mt-3 flex flex-wrap gap-1.5">
@@ -352,7 +353,7 @@ export default function CareerTwin() {
         )}
       </div>
 
-      <Card className="rise mt-4">
+      <Card className="rise mt-4 sw-card">
         <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-500">
           Add genuine evidence
         </p>
@@ -361,19 +362,19 @@ export default function CareerTwin() {
             value={proj.title}
             onChange={(e) => setProj({ ...proj, title: e.target.value })}
             placeholder="Project title"
-            className="rounded-lg border border-white/10 bg-ink-800 px-3 py-2 text-sm text-white placeholder:text-slate-600"
+            className="sw-input rounded-lg border border-white/10 bg-ink-800 px-3 py-2 text-sm text-white placeholder:text-slate-600"
           />
           <input
             value={proj.url}
             onChange={(e) => setProj({ ...proj, url: e.target.value })}
             placeholder="Link (https://…) — optional"
-            className="rounded-lg border border-white/10 bg-ink-800 px-3 py-2 text-sm text-white placeholder:text-slate-600"
+            className="sw-input rounded-lg border border-white/10 bg-ink-800 px-3 py-2 text-sm text-white placeholder:text-slate-600"
           />
           <input
             value={proj.skills}
             onChange={(e) => setProj({ ...proj, skills: e.target.value })}
             placeholder="Skills it proves, comma-separated"
-            className="rounded-lg border border-white/10 bg-ink-800 px-3 py-2 text-sm text-white placeholder:text-slate-600"
+            className="sw-input rounded-lg border border-white/10 bg-ink-800 px-3 py-2 text-sm text-white placeholder:text-slate-600"
           />
         </div>
         {formError && (
@@ -383,9 +384,9 @@ export default function CareerTwin() {
         )}
         <button
           onClick={() => void addProject()}
-          className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-signal-400 px-4 py-2 text-sm font-semibold text-ink-950 hover:bg-signal-300"
+          className="sw-btn mt-3 inline-flex items-center gap-1.5 rounded-lg bg-signal-400 px-4 py-2 text-sm font-semibold text-ink-950 hover:bg-signal-300"
         >
-          <Plus size={14} /> Save evidence to PostgreSQL
+          <Plus size={14} /> Save evidence
         </button>
       </Card>
     </div>

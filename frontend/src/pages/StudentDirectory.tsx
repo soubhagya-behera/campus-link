@@ -3,6 +3,7 @@ import { ArrowRight, Search } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Card, DemoTag, Empty, ErrorState, Loading, Meter, SectionTitle } from "../components/ui";
+import "../components/staff.css";
 import { api } from "../lib/server";
 import { useTower } from "../store/session";
 
@@ -59,14 +60,14 @@ export default function StudentDirectory() {
   });
 
   return (
-    <div>
+    <div className="st st-enter">
       <SectionTitle
         kicker="Students"
         title="Student directory"
         sub={`${students.data?.total ?? 0} registered students. New registrations appear here automatically.`}
         right={<DemoTag />}
       />
-      <Card className="p-4">
+      <Card className="st-card p-4">
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative min-w-0 flex-1 basis-52">
             <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--ws-faint)]" aria-hidden="true" />
@@ -75,14 +76,14 @@ export default function StudentDirectory() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search name, email, roll no…"
               aria-label="Search students by name, email or roll number"
-              className="min-h-[44px] w-full rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] py-1.5 pl-8 pr-2 text-sm text-[var(--ws-ink)]"
+              className="st-input min-h-[44px] w-full rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] py-1.5 pl-8 pr-2 text-sm text-[var(--ws-ink)]"
             />
           </div>
           <select
             value={branch}
             onChange={(e) => setBranch(e.target.value)}
             aria-label="Filter by branch"
-            className="min-h-[44px] shrink-0 rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-2 py-1.5 text-sm text-[var(--ws-ink)]"
+            className="st-select min-h-[44px] shrink-0 rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-2 py-1.5 text-sm text-[var(--ws-ink)]"
           >
             {["All", "CSE", "ECE", "IT", "EEE"].map((b) => (
               <option key={b}>{b}</option>
@@ -95,7 +96,7 @@ export default function StudentDirectory() {
               key={f}
               onClick={() => setBand(f)}
               aria-pressed={band === f}
-              className={`min-h-[44px] rounded-full border px-3.5 py-1.5 text-sm font-medium ${band === f ? "border-[var(--ws-forest)] bg-[var(--ws-forest)] text-[var(--ws-canvas)]" : "border-[var(--ws-line)] bg-[var(--ws-surface)] text-[var(--ws-mute)]"}`}
+              className={`st-tab min-h-[44px] rounded-full border px-3.5 py-1.5 text-sm font-medium ${band === f ? "border-[var(--ws-forest)] bg-[var(--ws-forest)] text-[var(--ws-canvas)]" : "border-[var(--ws-line)] bg-[var(--ws-surface)] text-[var(--ws-mute)]"}`}
             >
               {f}
             </button>
@@ -113,7 +114,7 @@ export default function StudentDirectory() {
             const score = scores.get(r.id);
             const hasRecord = r.skillCount > 0;
             return (
-              <li key={r.id} className="flex flex-col gap-2.5 rounded-xl border border-[var(--ws-line)] bg-[var(--ws-surface)] p-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+              <li key={r.id} className="st-lift flex flex-col gap-2.5 rounded-xl border border-[var(--ws-line)] bg-[var(--ws-surface)] p-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
                 <div className="flex min-w-0 items-center gap-3 sm:flex-1">
                   <div className="font-display flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--ws-forest)] text-xs font-bold text-[var(--ws-canvas)]" aria-hidden="true">
                     {r.fullName.split(" ").map((w) => w[0]).slice(0, 2).join("")}
@@ -145,7 +146,7 @@ export default function StudentDirectory() {
                 <Link
                   to={`/tower/students/${r.id}`}
                   aria-label={`View profile of ${r.fullName}`}
-                  className="inline-flex min-h-[44px] items-center justify-center gap-1 rounded-lg border border-[var(--ws-forest)] px-3 py-2 text-xs font-semibold text-[var(--ws-forest)] sm:w-auto sm:justify-start"
+                  className="st-btn-secondary inline-flex min-h-[44px] items-center justify-center gap-1 rounded-lg border border-[var(--ws-forest)] px-3 py-2 text-xs font-semibold text-[var(--ws-forest)] sm:w-auto sm:justify-start"
                 >
                   View profile <ArrowRight size={13} aria-hidden="true" />
                 </Link>

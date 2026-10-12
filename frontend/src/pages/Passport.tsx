@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { BadgeCheck, Download, Link2, ShieldCheck } from "lucide-react";
 import { Badge, Card, DemoTag, Empty, ErrorState, Loading, NoStudentState, SectionTitle } from "../components/ui";
+import "../components/student.css";
 import { useAttempts, useProfile, useSessionUser } from "../store/session";
 
 export default function Passport() {
@@ -38,7 +39,7 @@ export default function Passport() {
   const evaluated = (attempts.data?.data ?? []).filter((a) => a.status === "EVALUATED").length;
 
   return (
-    <div>
+    <div className="sw sw-enter">
       <SectionTitle
         kicker="Proof-of-Skill Passport"
         title="Don't list skills. Prove them."
@@ -46,7 +47,7 @@ export default function Passport() {
         right={<DemoTag />}
       />
 
-      <Card className="rise flex flex-wrap items-center gap-5">
+      <Card className="rise sw-card flex flex-wrap items-center gap-5">
         <div className="font-display flex h-16 w-16 items-center justify-center rounded-2xl bg-signal-400 text-2xl font-bold text-ink-950">
           {data.fullName.split(" ").map((w) => w[0]).slice(0, 2).join("")}
         </div>
@@ -66,14 +67,14 @@ export default function Passport() {
         </div>
         <button
           onClick={() => window.print()}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-sm font-medium text-slate-200 hover:border-white/30"
+          className="sw-btn-secondary inline-flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-sm font-medium text-slate-200 hover:border-white/30"
         >
           <Download size={14} /> Export
         </button>
       </Card>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <Card className="rise rise-1">
+        <Card className="rise rise-1 sw-card">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-500">Verified skills</p>
           {evidenced.length === 0 ? (
             <div className="mt-3">
@@ -85,7 +86,7 @@ export default function Passport() {
           ) : (
             <ul className="mt-3 space-y-3">
               {evidenced.map((s) => (
-                <li key={s.skill} className="rounded-xl border border-white/8 bg-white/[0.02] p-3">
+                <li key={s.skill} className="sw-lift rounded-xl border border-white/8 bg-white/[0.02] p-3">
                   <div className="flex items-center gap-2">
                     <BadgeCheck size={15} className="text-signal-400" />
                     <span className="font-semibold text-white">{s.skill}</span>
@@ -102,7 +103,7 @@ export default function Passport() {
             </ul>
           )}
         </Card>
-        <Card className="rise rise-2">
+        <Card className="rise rise-2 sw-card">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-500">
             Shipped work · {data.projects.length}
           </p>
@@ -113,7 +114,7 @@ export default function Passport() {
           ) : (
             <ul className="mt-3 space-y-3">
               {data.projects.map((p) => (
-                <li key={p.id} className="rounded-xl border border-white/8 bg-white/[0.02] p-3">
+                <li key={p.id} className="sw-lift rounded-xl border border-white/8 bg-white/[0.02] p-3">
                   <p className="font-semibold text-white">{p.title}</p>
                   {p.description && <p className="mt-0.5 text-sm text-slate-400">{p.description}</p>}
                   <div className="mt-2 flex flex-wrap gap-1.5">

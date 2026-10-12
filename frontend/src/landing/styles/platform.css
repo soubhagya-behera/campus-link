@@ -390,3 +390,45 @@
   background: var(--cl-forest);
   color: var(--cl-on-dark);
 }
+
+/* ────────────────────────────────────────── phone width (≤620px) ──────── */
+
+@media (max-width: 620px) {
+  /* Trim the cards' and figures' inner padding so their content uses more
+     of the (now narrower) gutter's reclaimed width. */
+  .cl-spotlight {
+    padding: 1.15rem;
+    min-width: 0;
+  }
+  .cl-card {
+    padding: 1.15rem;
+    min-width: 0;
+  }
+  .cl-mirror {
+    padding: 0.85rem;
+    gap: 0.55rem;
+  }
+  .cl-mirror-col {
+    min-width: 0;
+  }
+  /* The "Intermediate" level label is the widest flex item at 375px;
+     slightly smaller type and gap keep the row inside its column. */
+  .cl-mirror-row {
+    gap: 0.4rem;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.75rem;
+    min-width: 0;
+  }
+  .cl-mirror-row b {
+    flex-shrink: 0;
+    font-size: 0.5625rem;
+    letter-spacing: 0.06em;
+  }
+  .cl-card-figure--tint {
+    padding: 0.85rem;
+  }
+  .cl-pipeline-col {
+    min-width: 0;
+    padding: 0.45rem;
+  }
+}

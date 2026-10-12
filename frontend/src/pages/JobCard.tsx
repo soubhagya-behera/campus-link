@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -69,6 +69,11 @@ interface JobCardProps {
  */
 export default function JobCard({ match: m, application, applying, flash, onApply }: JobCardProps) {
   const [open, setOpen] = useState(false);
+  const [live, setLive] = useState(false);
+  useEffect(() => {
+    const t = requestAnimationFrame(() => setLive(true));
+    return () => cancelAnimationFrame(t);
+  }, []);
   const job = m.job;
   const status = application?.status ?? null;
   const isActive = status === "APPLIED" || status === "SHORTLISTED";
@@ -88,7 +93,7 @@ export default function JobCard({ match: m, application, applying, flash, onAppl
   ];
 
   return (
-    <Card className="rise">
+    <Card className="rise sw-card">
       {/* 1–3 · what, who, terms */}
       <div className="flex flex-wrap items-start gap-4">
         <div className="min-w-0 flex-1">
@@ -116,7 +121,7 @@ export default function JobCard({ match: m, application, applying, flash, onAppl
             {m.score}% match
           </Badge>
           <div className="w-28">
-            <Meter value={m.score} tone={m.score >= 70 ? "signal" : "sky"} />
+            <Meter value={live ? m.score : 0} tone={m.score >= 70 ? "signal" : "sky"} />
           </div>
         </div>
       </div>
@@ -129,7 +134,7 @@ export default function JobCard({ match: m, application, applying, flash, onAppl
         {isActive ? (
           <Link
             to="/applications"
-            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-[var(--ws-forest)] bg-[var(--ws-lime-wash)] px-4 py-2 text-sm font-semibold text-[var(--ws-forest)]"
+            className="sw-link inline-flex items-center gap-1.5 rounded-lg border border-[var(--ws-forest)] bg-[var(--ws-lime-wash)] px-4 py-2 text-sm font-semibold text-[var(--ws-forest)]"
           >
             <CheckCircle2 size={14} /> Applied — track
           </Link>
@@ -143,7 +148,7 @@ export default function JobCard({ match: m, application, applying, flash, onAppl
             </span>
             <Link
               to="/applications"
-              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-[var(--ws-line)] px-4 py-2 text-sm font-semibold text-[var(--ws-forest)]"
+              className="sw-link inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-[var(--ws-line)] px-4 py-2 text-sm font-semibold text-[var(--ws-forest)]"
             >
               View in tracker <ArrowRight size={14} aria-hidden="true" />
             </Link>
@@ -158,7 +163,7 @@ export default function JobCard({ match: m, application, applying, flash, onAppl
             </span>
             <Link
               to="/applications"
-              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-[var(--ws-line)] px-4 py-2 text-sm font-semibold text-[var(--ws-forest)]"
+              className="sw-link inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-[var(--ws-line)] px-4 py-2 text-sm font-semibold text-[var(--ws-forest)]"
             >
               View in tracker <ArrowRight size={14} aria-hidden="true" />
             </Link>
@@ -167,7 +172,7 @@ export default function JobCard({ match: m, application, applying, flash, onAppl
           <button
             onClick={() => onApply(job.id)}
             disabled={applying}
-            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg bg-signal-400 px-4 py-2 text-sm font-semibold text-ink-950 hover:bg-signal-300 disabled:opacity-50"
+            className="sw-btn inline-flex min-h-[44px] items-center gap-1.5 rounded-lg bg-signal-400 px-4 py-2 text-sm font-semibold text-ink-950 hover:bg-signal-300 disabled:opacity-50"
           >
             <Plus size={14} /> {applying ? "Applying…" : "Apply now"}
           </button>
@@ -175,7 +180,7 @@ export default function JobCard({ match: m, application, applying, flash, onAppl
         <button
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
-          className="inline-flex min-h-[44px] items-center gap-1 rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-4 py-2 text-sm font-semibold text-[var(--ws-forest)]"
+          className="sw-btn-secondary inline-flex min-h-[44px] items-center gap-1 rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-4 py-2 text-sm font-semibold text-[var(--ws-forest)]"
         >
           {open ? "Hide details" : "View details"}
           <ChevronDown size={14} className={cn("transition-transform", open && "rotate-180")} aria-hidden="true" />
@@ -307,7 +312,7 @@ export default function JobCard({ match: m, application, applying, flash, onAppl
           <span className="font-semibold text-[var(--ws-forest)]">Next step:</span> {m.nextStep}{" "}
           <Link
             to="/sprint"
-            className="inline-flex items-center gap-0.5 font-medium text-[var(--ws-forest)] hover:underline"
+            className="sw-link inline-flex items-center gap-0.5 font-medium text-[var(--ws-forest)] hover:underline"
           >
             open sprints <ArrowRight size={12} aria-hidden="true" />
           </Link>

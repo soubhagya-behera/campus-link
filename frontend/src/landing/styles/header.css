@@ -231,6 +231,16 @@
   .cl-head-cta .cl-link {
     display: none;
   }
+  /* With the nav hidden the header has two flex children: the wordmark and
+     the action group. Space-between pins the wordmark left and the group
+     right; margin-left: auto keeps the group right even if a third child
+     appears later. The burger (inside the group) lands on the right edge. */
+  .cl-head-in {
+    justify-content: space-between;
+  }
+  .cl-head-cta {
+    margin-left: auto;
+  }
   .cl-burger {
     display: flex;
   }

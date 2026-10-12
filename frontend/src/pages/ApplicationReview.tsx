@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Empty, ErrorState, Loading, SectionTitle } from "../components/ui";
+import "../components/staff.css";
 import { ApiError, api, type ApplicationRecord } from "../lib/server";
 
 const STATUS_FILTERS = ["All", "APPLIED", "SHORTLISTED", "REJECTED", "HIRED", "WITHDRAWN"] as const;
@@ -62,7 +63,7 @@ export default function ApplicationReview() {
   const rows = apps.data ?? [];
 
   return (
-    <div>
+    <div className="st st-enter">
       <SectionTitle kicker="Applications" title="Review applications" />
       {notice && (
         <p role="status" className="mb-3 rounded-xl border border-[var(--ws-forest)] bg-[var(--ws-lime-wash)] p-3 text-sm text-[var(--ws-ink)]">
@@ -80,7 +81,7 @@ export default function ApplicationReview() {
             key={f}
             onClick={() => setFilter(f)}
             aria-pressed={filter === f}
-            className={`min-h-[44px] rounded-full border px-3.5 py-1.5 text-sm font-medium ${filter === f ? "border-[var(--ws-forest)] bg-[var(--ws-forest)] text-[var(--ws-canvas)]" : "border-[var(--ws-line)] bg-[var(--ws-surface)] text-[var(--ws-mute)]"}`}
+            className={`st-tab min-h-[44px] rounded-full border px-3.5 py-1.5 text-sm font-medium ${filter === f ? "border-[var(--ws-forest)] bg-[var(--ws-forest)] text-[var(--ws-canvas)]" : "border-[var(--ws-line)] bg-[var(--ws-surface)] text-[var(--ws-mute)]"}`}
           >
             {f}
           </button>
@@ -100,7 +101,7 @@ export default function ApplicationReview() {
       ) : (
         <ul className="mt-3 space-y-3 sm:space-y-2">
           {rows.map((a) => (
-            <li key={a.id} className="flex flex-col gap-2 rounded-xl border border-[var(--ws-line)] bg-[var(--ws-surface)] p-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+            <li key={a.id} className="st-lift flex flex-col gap-2 rounded-xl border border-[var(--ws-line)] bg-[var(--ws-surface)] p-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
               <div className="w-full min-w-0 sm:w-auto sm:flex-1">
                 <p className="break-words text-sm font-semibold leading-snug text-[var(--ws-ink)] sm:truncate">
                   <Link to={`/tower/applications/${a.id}`} className="block hover:underline sm:inline">
@@ -119,7 +120,7 @@ export default function ApplicationReview() {
                 <Link
                   to={`/tower/applications/${a.id}`}
                   aria-label={`Review application from ${a.student?.fullName ?? "applicant"} for ${a.job.title}`}
-                  className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-[var(--ws-line)] px-3 py-2 text-xs font-semibold text-[var(--ws-forest)] sm:justify-start"
+                  className="st-btn-secondary inline-flex min-h-[44px] items-center justify-center rounded-lg border border-[var(--ws-line)] px-3 py-2 text-xs font-semibold text-[var(--ws-forest)] sm:justify-start"
                 >
                   View profile
                 </Link>
@@ -128,7 +129,7 @@ export default function ApplicationReview() {
                     key={to}
                     onClick={() => void transition(a, to)}
                     disabled={pendingId !== null}
-                    className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-[var(--ws-forest)] px-3 py-2 text-xs font-semibold text-[var(--ws-forest)] disabled:opacity-50 sm:justify-start"
+                    className={to === "REJECTED" ? "st-btn-danger inline-flex min-h-[44px] items-center justify-center rounded-lg border px-3 py-2 text-xs font-semibold disabled:opacity-50 sm:justify-start" : "st-btn-secondary inline-flex min-h-[44px] items-center justify-center rounded-lg border border-[var(--ws-forest)] px-3 py-2 text-xs font-semibold text-[var(--ws-forest)] disabled:opacity-50 sm:justify-start"}
                   >
                     {pendingId === a.id ? "Saving…" : to === "HIRED" ? "Mark hired" : to === "SHORTLISTED" ? "Shortlist" : "Reject"}
                   </button>

@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Badge, Card, DemoTag, Empty, ErrorState, Loading, SectionTitle } from "../components/ui";
+import "../components/staff.css";
 import { cn } from "../lib/cn";
 import {
   arenaActivity,
@@ -139,7 +140,7 @@ export default function StaffArena() {
   const acts = activity.data?.data ?? [];
 
   return (
-    <div>
+    <div className="st st-enter">
       <SectionTitle
         kicker="Arena bank"
         title="Interview practice questions"
@@ -152,18 +153,18 @@ export default function StaffArena() {
         </p>
       )}
 
-      <Card className="p-5">
+      <Card className="st-card p-5">
         <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--ws-faint)]">
           {editingId ? "Edit question" : "New question"}
         </p>
         <label className="mt-3 block text-sm font-medium text-[var(--ws-ink)]">
           Question text
-          <textarea value={form.prompt} onChange={(e) => set("prompt", e.target.value)} rows={3} maxLength={1000} placeholder="What should the student explain or decide?" className="mt-1 w-full rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-3 py-2 text-sm leading-relaxed" />
+          <textarea value={form.prompt} onChange={(e) => set("prompt", e.target.value)} rows={3} maxLength={1000} placeholder="What should the student explain or decide?" className="st-textarea mt-1 w-full rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-3 py-2 text-sm leading-relaxed" />
         </label>
         <div className="mt-2 grid gap-2 md:grid-cols-3">
           <label className="block text-sm font-medium text-[var(--ws-ink)]">
             Category
-            <select value={form.category} onChange={(e) => set("category", e.target.value)} className="mt-1 min-h-[44px] w-full rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-3 py-2 text-sm">
+            <select value={form.category} onChange={(e) => set("category", e.target.value)} className="st-select mt-1 min-h-[44px] w-full rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-3 py-2 text-sm">
               {CATEGORIES.map((c) => (
                 <option key={c}>{c}</option>
               ))}
@@ -171,7 +172,7 @@ export default function StaffArena() {
           </label>
           <label className="block text-sm font-medium text-[var(--ws-ink)] md:col-span-2">
             Coaching hint (optional)
-            <input value={form.hint} onChange={(e) => set("hint", e.target.value)} maxLength={500} placeholder="What a strong answer names…" className="mt-1 min-h-[44px] w-full rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-3 py-2 text-sm" />
+            <input value={form.hint} onChange={(e) => set("hint", e.target.value)} maxLength={500} placeholder="What a strong answer names…" className="st-input mt-1 min-h-[44px] w-full rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-3 py-2 text-sm" />
           </label>
         </div>
         <label className="mt-2 flex min-h-[44px] items-center gap-2 text-sm font-medium text-[var(--ws-ink)]">
@@ -184,11 +185,11 @@ export default function StaffArena() {
           </p>
         )}
         <div className="mt-3 flex flex-wrap gap-2">
-          <button onClick={() => void save()} disabled={busy} className="inline-flex min-h-[44px] items-center rounded-lg bg-[var(--ws-forest)] px-4 py-2 text-sm font-semibold text-[var(--ws-canvas)] disabled:opacity-50">
+          <button onClick={() => void save()} disabled={busy} className="st-btn-forest inline-flex min-h-[44px] items-center rounded-lg bg-[var(--ws-forest)] px-4 py-2 text-sm font-semibold text-[var(--ws-canvas)] disabled:opacity-50">
             {busy ? "Saving…" : editingId ? "Save changes" : "Add question"}
           </button>
           {editingId && (
-            <button onClick={() => { setEditingId(null); setForm(EMPTY_FORM); setFormError(null); }} disabled={busy} className="inline-flex min-h-[44px] items-center rounded-lg border border-[var(--ws-line)] px-4 py-2 text-sm font-medium text-[var(--ws-mute)]">
+            <button onClick={() => { setEditingId(null); setForm(EMPTY_FORM); setFormError(null); }} disabled={busy} className="st-btn-secondary inline-flex min-h-[44px] items-center rounded-lg border border-[var(--ws-line)] px-4 py-2 text-sm font-medium text-[var(--ws-mute)]">
               Cancel
             </button>
           )}
@@ -205,7 +206,7 @@ export default function StaffArena() {
       ) : (
         <ul className="mt-3 space-y-2">
           {rows.map((q) => (
-            <li key={q.id} className={cn("rounded-xl border bg-[var(--ws-surface)] p-4", q.isActive ? "border-[var(--ws-line)]" : "border-dashed border-[var(--ws-line)] opacity-75")}>
+            <li key={q.id} className={cn("st-lift rounded-xl border bg-[var(--ws-surface)] p-4", q.isActive ? "border-[var(--ws-line)]" : "border-dashed border-[var(--ws-line)] opacity-75")}>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge tone={q.isActive ? "signal" : "neutral"}>{q.isActive ? "Active" : "Inactive"}</Badge>
                 <Badge tone="sky">{q.category}</Badge>
@@ -213,13 +214,13 @@ export default function StaffArena() {
                 {q.hint && <p className="w-full text-xs text-[var(--ws-mute)]">Hint: {q.hint}</p>}
               </div>
               <div className="mt-2 flex flex-wrap gap-2">
-                <button onClick={() => { setEditingId(q.id); setForm({ prompt: q.prompt, category: q.category, hint: q.hint ?? "", isActive: q.isActive }); setFormError(null); }} disabled={busy} className="inline-flex min-h-[44px] items-center rounded-lg border border-[var(--ws-line)] px-3 py-2 text-xs font-medium text-[var(--ws-forest)] disabled:opacity-50">
+                <button onClick={() => { setEditingId(q.id); setForm({ prompt: q.prompt, category: q.category, hint: q.hint ?? "", isActive: q.isActive }); setFormError(null); }} disabled={busy} className="st-btn-secondary inline-flex min-h-[44px] items-center rounded-lg border border-[var(--ws-line)] px-3 py-2 text-xs font-medium text-[var(--ws-forest)] disabled:opacity-50">
                   Edit
                 </button>
-                <button onClick={() => void toggle(q)} disabled={busy} className="inline-flex min-h-[44px] items-center rounded-lg border border-[var(--ws-line)] px-3 py-2 text-xs font-medium text-[var(--ws-mute)] disabled:opacity-50">
+                <button onClick={() => void toggle(q)} disabled={busy} className="st-btn-secondary inline-flex min-h-[44px] items-center rounded-lg border border-[var(--ws-line)] px-3 py-2 text-xs font-medium text-[var(--ws-mute)] disabled:opacity-50">
                   {q.isActive ? "Deactivate" : "Activate"}
                 </button>
-                <button onClick={() => void remove(q)} disabled={busy} className="inline-flex min-h-[44px] items-center rounded-lg border border-[#e8c6bf] px-3 py-2 text-xs font-medium text-[var(--ws-err)] disabled:opacity-50">
+                <button onClick={() => void remove(q)} disabled={busy} className="st-btn-danger inline-flex min-h-[44px] items-center rounded-lg border border-[#e8c6bf] px-3 py-2 text-xs font-medium text-[var(--ws-err)] disabled:opacity-50">
                   Delete
                 </button>
               </div>
@@ -230,13 +231,13 @@ export default function StaffArena() {
 
       <h2 className="font-display mt-8 text-lg font-bold text-[var(--ws-ink)]">Practice activity</h2>
       <div className="mt-2 flex flex-wrap gap-2">
-        <select value={fType} onChange={(e) => setFType(e.target.value)} aria-label="Filter by session type" className="min-h-[44px] rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-3 py-2 text-sm">
+        <select value={fType} onChange={(e) => setFType(e.target.value)} aria-label="Filter by session type" className="st-select min-h-[44px] rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-3 py-2 text-sm">
           <option value="">All types</option>
           {TYPES.slice(1).map((t) => (
             <option key={t} value={t}>{t}</option>
           ))}
         </select>
-        <select value={fPrompt} onChange={(e) => setFPrompt(e.target.value)} aria-label="Filter by question" className="min-h-[44px] rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-3 py-2 text-sm">
+        <select value={fPrompt} onChange={(e) => setFPrompt(e.target.value)} aria-label="Filter by question" className="st-select min-h-[44px] rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-3 py-2 text-sm">
           <option value="">All questions</option>
           {rows.filter((q) => q.isActive).map((q) => (
             <option key={q.id} value={q.id}>{q.prompt.slice(0, 60)}</option>
@@ -252,7 +253,7 @@ export default function StaffArena() {
       ) : (
         <ul className="mt-3 space-y-2">
           {acts.map((a) => (
-            <li key={a.id} className="rounded-xl border border-[var(--ws-line)] bg-[var(--ws-surface)] p-4">
+            <li key={a.id} className="st-lift rounded-xl border border-[var(--ws-line)] bg-[var(--ws-surface)] p-4">
               <p className="text-sm font-semibold text-[var(--ws-ink)]">
                 {a.student.fullName} <span className="font-normal text-[var(--ws-mute)]">· {a.type}</span>
               </p>

@@ -5,6 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import ApplicationReview from "./ApplicationReview";
 import DriveManager from "./DriveManager";
 import { Badge, Card, DemoTag, ErrorState, Loading, Meter, SectionTitle } from "../components/ui";
+import "../components/staff.css";
 import { ApiError } from "../lib/server";
 import { useTower } from "../store/session";
 
@@ -54,7 +55,7 @@ export default function PlacementTower() {
             </p>
             <Link
               to="/app"
-              className="mt-4 inline-flex min-h-[44px] items-center gap-1.5 rounded-lg bg-signal-400 px-4 py-2 text-sm font-semibold text-ink-950 hover:bg-signal-300"
+              className="st-btn mt-4 inline-flex min-h-[44px] items-center gap-1.5 rounded-lg bg-signal-400 px-4 py-2 text-sm font-semibold text-ink-950 hover:bg-signal-300"
             >
               Back to your overview <ArrowRight size={14} />
             </Link>
@@ -78,20 +79,13 @@ export default function PlacementTower() {
   const projected = Math.min(s.students, Math.round(readyCount * (0.42 + extraDrives * 0.12)));
 
   return (
-    <div>
+    <div className="st st-enter">
       <SectionTitle
         kicker="Placement overview"
         title="The whole batch, one screen"
         sub="Live counts from current records — students, open drives and applications."
         right={<DemoTag />}
       />
-
-      {s.demoSeedPresent && (
-        <p className="mb-4 rounded-xl border border-[#e5d3a8] bg-[var(--ws-warn-bg)] p-3 text-sm text-[var(--ws-warn)]">
-          Development seed records are present (ids prefixed demo.*). Replace them with real
-          student and drive records before any real placement cycle.
-        </p>
-      )}
 
       <section id="overview" aria-label="Overview" className="scroll-mt-24">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -101,7 +95,7 @@ export default function PlacementTower() {
             { label: "Applications", value: `${s.applications}`, sub: Object.entries(s.byStatus).map(([k, v]) => `${k} ${v}`).join(" · ") || "none yet" },
             { label: "Avg proficiency", value: `${s.avgReadiness}`, sub: "mean recorded skill level, /100" },
           ].map((k) => (
-            <Card key={k.label} className="rise">
+            <Card key={k.label} className="rise st-card">
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--ws-faint)]">{k.label}</p>
               <p className="font-display mt-1 text-3xl font-bold text-[var(--ws-ink)]">{k.value}</p>
               <p className="mt-0.5 text-xs text-[var(--ws-mute)]">{k.sub}</p>
@@ -109,7 +103,7 @@ export default function PlacementTower() {
           ))}
         </div>
 
-        <Card className="rise mt-4">
+        <Card className="rise mt-4 st-card">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--ws-faint)]">
             Application mix
           </p>
@@ -138,7 +132,7 @@ export default function PlacementTower() {
       </section>
 
       <section id="students" aria-label="Students" className="mt-8 scroll-mt-24">
-        <Card className="rise">
+        <Card className="rise st-card">
           <div className="flex flex-wrap items-center gap-3">
             <div className="min-w-0 flex-1">
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--ws-faint)]">
@@ -151,7 +145,7 @@ export default function PlacementTower() {
             </div>
             <Link
               to="/tower/students"
-              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg bg-[var(--ws-forest)] px-4 py-2 text-sm font-semibold text-[var(--ws-canvas)]"
+              className="st-btn-forest inline-flex min-h-[44px] items-center gap-1.5 rounded-lg bg-[var(--ws-forest)] px-4 py-2 text-sm font-semibold text-[var(--ws-canvas)]"
             >
               Open directory <ArrowRight size={14} aria-hidden="true" />
             </Link>
@@ -160,7 +154,7 @@ export default function PlacementTower() {
       </section>
 
       <section id="reports" aria-label="Reports" className="mt-8 scroll-mt-24">
-        <Card className="rise">
+        <Card className="rise st-card">
           <div className="flex flex-wrap items-center gap-3">
             <div className="min-w-0 flex-1">
               <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--ws-faint)]">
@@ -172,13 +166,13 @@ export default function PlacementTower() {
             </div>
             <Link
               to="/tower/announcements"
-              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg bg-[var(--ws-forest)] px-4 py-2 text-sm font-semibold text-[var(--ws-canvas)]"
+              className="st-btn-forest inline-flex min-h-[44px] items-center gap-1.5 rounded-lg bg-[var(--ws-forest)] px-4 py-2 text-sm font-semibold text-[var(--ws-canvas)]"
             >
               Manage announcements <ArrowRight size={14} aria-hidden="true" />
             </Link>
           </div>
         </Card>
-        <Card className="rise mt-4 border-sky-400/20">
+        <Card className="rise mt-4 st-card border-sky-400/20">
           <p className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-[var(--ws-sky)]">
             <FlaskConical size={13} aria-hidden="true" /> What-If Lab · illustrative model
           </p>

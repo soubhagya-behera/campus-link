@@ -255,7 +255,7 @@ export default function Shell() {
           <div className="mt-2 rounded-xl border border-[var(--ws-line)] bg-[var(--ws-canvas)] p-3">
             <p className="text-sm font-semibold text-[var(--ws-ink)]">No portal for this account</p>
             <p className="mt-1 text-xs leading-relaxed text-[var(--ws-mute)]">
-              Recruiter workflows are API-only in this build. Contact your placement cell.
+              No recruiter portal for this account. Contact your placement cell.
             </p>
           </div>
         )}

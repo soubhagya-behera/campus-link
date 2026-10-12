@@ -1,11 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, CalendarClock, Crosshair, ListChecks, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { Badge, Card, DemoTag, ErrorState, Loading, Meter, Ring, SectionTitle } from "../components/ui";
 import { ApiError } from "../lib/server";
 import { useApplications, useMatches, useProfile, useProfileId, useReadiness, useSessionUser } from "../store/session";
 import { api } from "../lib/server";
+import "./Dashboard.css";
 
 function greeting(): string {
   const h = new Date().getHours();
@@ -24,6 +25,13 @@ export default function Dashboard() {
   const qc = useQueryClient();
   const [flash, setFlash] = useState<{ jobId: string; kind: "ok" | "dup" | "error"; message?: string } | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
+  // Entrance animation gate: meters and the ring render at zero, then ease
+  // to their real server values on the next frame. Text always shows truth.
+  const [live, setLive] = useState(false);
+  useEffect(() => {
+    const t = requestAnimationFrame(() => setLive(true));
+    return () => cancelAnimationFrame(t);
+  }, []);
 
   // /app is the student overview. Placement staff land on their own
   // overview instead; recruiter accounts get an explicit unavailable-portal
@@ -38,8 +46,7 @@ export default function Dashboard() {
         <Card className="p-6">
           <p className="text-sm leading-relaxed text-slate-300">
             This account is signed in as <span className="font-semibold text-white">{user.email}</span> with
-            the recruiter role. There is no recruiter portal in this build — recruiter workflows
-            (own-company drives and applicant review) are API-only. Ask your placement cell for
+            the recruiter role. There is no recruiter portal for this account — ask your placement cell for
             assistance.
           </p>
         </Card>
@@ -102,7 +109,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div>
+    <div className="db">
       <SectionTitle
         kicker="Student overview"
         title={`${greeting()}, ${name}.`}
@@ -111,8 +118,8 @@ export default function Dashboard() {
       />
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="rise flex items-center gap-5">
-          <Ring value={score} />
+        <Card className="rise db-card flex items-center gap-5">
+          <Ring value={live ? score : 0} />
           <div className="min-w-0">
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-500">
               Career readiness
@@ -127,14 +134,14 @@ export default function Dashboard() {
             </p>
             <Link
               to="/twin"
-              className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-signal-300 hover:underline"
+              className="db-link mt-2 inline-flex items-center gap-1 text-sm font-medium text-signal-300 hover:underline"
             >
               How is this computed? <ArrowRight size={14} />
             </Link>
           </div>
         </Card>
 
-        <Card className="rise rise-1">
+        <Card className="rise rise-1 db-card">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-500">
             Application pipeline
           </p>
@@ -152,7 +159,7 @@ export default function Dashboard() {
                       {s}
                     </span>
                     <Meter
-                      value={apps.length ? (n / apps.length) * 100 : 0}
+                      value={live && apps.length ? (n / apps.length) * 100 : 0}
                       tone={s === "SHORTLISTED" ? "signal" : s === "APPLIED" ? "sky" : "amber"}
                     />
                     <span className="w-4 text-right font-mono text-slate-400">{n}</span>
@@ -163,13 +170,13 @@ export default function Dashboard() {
           </div>
           <Link
             to="/applications"
-            className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-signal-300 hover:underline"
+            className="db-link mt-3 inline-flex items-center gap-1 text-sm font-medium text-signal-300 hover:underline"
           >
             Open tracker <ArrowRight size={14} />
           </Link>
         </Card>
 
-        <Card className="rise rise-2">
+        <Card className="rise rise-2 db-card">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-slate-500">
             Top gaps across open roles
           </p>
@@ -192,7 +199,7 @@ export default function Dashboard() {
           )}
           <Link
             to="/mirror"
-            className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-signal-300 hover:underline"
+            className="db-link mt-3 inline-flex items-center gap-1 text-sm font-medium text-signal-300 hover:underline"
           >
             Inspect matches <ArrowRight size={14} />
           </Link>
@@ -201,21 +208,21 @@ export default function Dashboard() {
 
       <h2 className="font-display mt-8 text-lg font-bold text-white">Next actions</h2>
       <div className="mt-3 grid gap-4 md:grid-cols-3">
-        <Card className="rise rise-1 flex flex-col">
-          <Crosshair size={20} className="text-signal-400" />
+        <Card className="rise rise-1 db-card flex flex-col">
+          <Crosshair size={20} className="db-action-icon text-signal-400" />
           <p className="mt-3 font-semibold text-white">
             {top && top.gaps.length > 0 ? `Close the “${top.gaps[0].skill}” gap` : "Apply to your top match"}
           </p>
           <p className="mt-1 flex-1 text-sm text-slate-400">{top?.nextStep ?? "No open roles right now."}</p>
           <Link
             to="/sprint"
-            className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-lg bg-signal-400 px-3 py-1.5 text-sm font-semibold text-ink-950 hover:bg-signal-300"
+            className="db-btn mt-4 inline-flex w-fit items-center gap-1.5 rounded-lg bg-signal-400 px-3 py-1.5 text-sm font-semibold text-ink-950 hover:bg-signal-300"
           >
             Start sprint <ArrowRight size={14} />
           </Link>
         </Card>
-        <Card className="rise rise-2 flex flex-col">
-          <CalendarClock size={20} className="text-signal-400" />
+        <Card className="rise rise-2 db-card flex flex-col">
+          <CalendarClock size={20} className="db-action-icon text-signal-400" />
           <p className="mt-3 font-semibold text-white">
             {activeApps.length > 0 ? "Move an active file forward" : "No live applications"}
           </p>
@@ -226,20 +233,20 @@ export default function Dashboard() {
           </p>
           <Link
             to={activeApps.length > 0 ? "/applications" : "/mirror"}
-            className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-lg bg-signal-400 px-3 py-1.5 text-sm font-semibold text-ink-950 hover:bg-signal-300"
+            className="db-btn mt-4 inline-flex w-fit items-center gap-1.5 rounded-lg bg-signal-400 px-3 py-1.5 text-sm font-semibold text-ink-950 hover:bg-signal-300"
           >
             {activeApps.length > 0 ? "Track applications" : "Find matches"} <ArrowRight size={14} />
           </Link>
         </Card>
-        <Card className="rise rise-3 flex flex-col">
-          <Sparkles size={20} className="text-signal-400" />
+        <Card className="rise rise-3 db-card flex flex-col">
+          <Sparkles size={20} className="db-action-icon text-signal-400" />
           <p className="mt-3 font-semibold text-white">Rehearse the story behind your evidence</p>
           <p className="mt-1 flex-1 text-sm text-slate-400">
             Rule-based practice rounds turn shipped projects into interview answers.
           </p>
           <Link
             to="/arena"
-            className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-lg bg-signal-400 px-3 py-1.5 text-sm font-semibold text-ink-950 hover:bg-signal-300"
+            className="db-btn mt-4 inline-flex w-fit items-center gap-1.5 rounded-lg bg-signal-400 px-3 py-1.5 text-sm font-semibold text-ink-950 hover:bg-signal-300"
           >
             Enter arena <ArrowRight size={14} />
           </Link>
@@ -250,7 +257,7 @@ export default function Dashboard() {
         <h2 className="font-display text-lg font-bold text-white">Recommended for you</h2>
         <Link
           to="/mirror"
-          className="inline-flex items-center gap-1 text-sm font-medium text-signal-300 hover:underline"
+          className="db-link inline-flex items-center gap-1 text-sm font-medium text-signal-300 hover:underline"
         >
           All matches <ArrowRight size={14} />
         </Link>
@@ -265,7 +272,7 @@ export default function Dashboard() {
           {ranked.map((m) => {
             const applied = apps.some((a) => a.job.id === m.job.id);
             return (
-              <Card key={m.job.id} className="rise rise-1">
+              <Card key={m.job.id} className="rise rise-1 db-card">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="font-semibold text-white">{m.job.title}</p>
@@ -278,7 +285,7 @@ export default function Dashboard() {
                   </Badge>
                 </div>
                 <div className="mt-3">
-                  <Meter value={m.score} tone={m.score >= 70 ? "signal" : "sky"} />
+                  <Meter value={live ? m.score : 0} tone={m.score >= 70 ? "signal" : "sky"} />
                 </div>
                 <p className="mt-2 text-xs text-slate-500">
                   {m.gaps.length === 0 ? "No gaps — strong fit" : `Missing: ${m.gaps.map((g) => g.skill).join(", ")}`}
@@ -291,7 +298,7 @@ export default function Dashboard() {
                   <button
                     onClick={() => void applyQuick(m.job.id)}
                     disabled={pendingId !== null}
-                    className="mt-3 rounded-lg border border-signal-500/40 bg-signal-400/10 px-3 py-1.5 text-sm font-semibold text-signal-300 hover:bg-signal-400/20 disabled:opacity-50"
+                    className="db-btn-ghost mt-3 rounded-lg border border-signal-500/40 bg-signal-400/10 px-3 py-1.5 text-sm font-semibold text-signal-300 hover:bg-signal-400/20 disabled:opacity-50"
                   >
                     {pendingId === m.job.id ? "Applying…" : "Apply now"}
                   </button>

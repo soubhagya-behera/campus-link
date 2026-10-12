@@ -8,6 +8,7 @@ import {
   SprintCard,
 } from "./ApplicantEvidence";
 import { Badge, Card, DemoTag, ErrorState, Loading, SectionTitle } from "../components/ui";
+import "../components/staff.css";
 import { api } from "../lib/server";
 import { arenaSessions } from "../lib/arena";
 import { isPlacement, useSessionUser } from "../store/session";
@@ -95,11 +96,11 @@ export default function StudentProfile() {
   const scoredArena = (arena.data ?? []).filter((s) => s.score !== null);
 
   return (
-    <div>
+    <div className="st st-enter">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <Link
           to="/tower/students"
-          className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-4 py-2 text-sm font-semibold text-[var(--ws-forest)]"
+          className="st-btn-secondary inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-4 py-2 text-sm font-semibold text-[var(--ws-forest)]"
         >
           <ArrowLeft size={14} aria-hidden="true" /> Back to students
         </Link>
@@ -123,7 +124,7 @@ export default function StudentProfile() {
       {/* B–C · two independently flowing columns: nothing stretches, nothing waits. */}
       <div className="mt-4 grid items-start gap-4 md:grid-cols-2">
         <div className="min-w-0 space-y-4">
-          <Card className="p-5">
+          <Card className="st-card p-5">
             <h2 className="text-base font-bold text-[var(--ws-ink)]">Academic profile</h2>
             <p className="mt-2 text-sm leading-7 text-[var(--ws-ink)]">
               {[
@@ -145,7 +146,7 @@ export default function StudentProfile() {
           <SprintCard evaluated={evaluated} />
         </div>
         <div className="min-w-0 space-y-4">
-          <Card className="p-5">
+          <Card className="st-card p-5">
             <h2 className="text-base font-bold text-[var(--ws-ink)]">
               Readiness{ready ? <span className="ml-2 text-[var(--ws-forest)]">{ready.score}/100</span> : null}
             </h2>

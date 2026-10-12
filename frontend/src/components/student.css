@@ -1,0 +1,260 @@
+/* ============================================================================
+   Student workspace interaction system (.sw scope — student pages only).
+   Staff pages, landing and auth never match .sw, so they are unaffected.
+   Language: Level 1 calm surfaces → Level 2 hover halo+lift → Level 3
+   glowing primary actions. Transform/opacity/shadow only; lifts never move
+   siblings; every motion collapses under prefers-reduced-motion.
+   ========================================================================= */
+
+@import "./student-tokens.css";
+
+/* ── Page entry: one gentle rise for the whole page ───────────────────── */
+
+.sw-enter {
+  animation: sw-enter 0.45s var(--sw-ease) both;
+}
+@keyframes sw-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Cards & rows: calm rest, halo + lift on hover ────────────────────── */
+
+.sw-card,
+.sw-lift {
+  transition:
+    transform var(--sw-t-mid) var(--sw-ease),
+    box-shadow var(--sw-t-mid) var(--sw-ease),
+    border-color var(--sw-t-fast) linear,
+    background-color var(--sw-t-fast) linear;
+}
+
+.sw-card {
+  position: relative;
+  box-shadow: var(--sw-shadow-rest);
+}
+
+.sw-card::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 1.25rem;
+  right: 1.25rem;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--sw-lime) 35%, var(--sw-lime) 65%, transparent);
+  opacity: 0;
+  transform: scaleX(0.5);
+  transition:
+    opacity var(--sw-t-mid) var(--sw-ease),
+    transform var(--sw-t-mid) var(--sw-ease);
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .sw-card:hover,
+  .sw-lift:hover {
+    transform: translate3d(0, -4px, 0);
+    border-color: rgb(63 84 23 / 0.45);
+    box-shadow: var(--sw-shadow-hover);
+  }
+  .sw-card:hover::before {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+/* ── Primary buttons: confident lime glow ─────────────────────────────── */
+
+.sw-btn {
+  min-height: 44px;
+  box-shadow: var(--sw-btn-glow);
+  transition:
+    background-color var(--sw-t-fast) linear,
+    box-shadow var(--sw-t-mid) var(--sw-ease),
+    transform 140ms var(--sw-ease);
+}
+
+.sw-btn svg {
+  transition: transform var(--sw-t-mid) var(--sw-ease);
+}
+
+@media (hover: hover) {
+  .sw-btn:hover:not(:disabled) {
+    transform: translate3d(0, -2px, 0);
+    box-shadow: var(--sw-btn-glow-hover);
+  }
+  .sw-btn:hover:not(:disabled) svg {
+    transform: translateX(3px);
+  }
+}
+
+.sw-btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow:
+    0 6px 14px -8px rgb(23 60 47 / 0.5),
+    0 0 0 1px rgb(197 232 108 / 0.4);
+}
+
+/* ── Secondary buttons: quiet border, gentle lift ─────────────────────── */
+
+.sw-btn-secondary {
+  min-height: 44px;
+  transition:
+    background-color var(--sw-t-fast) linear,
+    border-color var(--sw-t-fast) linear,
+    box-shadow var(--sw-t-mid) var(--sw-ease),
+    transform 140ms var(--sw-ease);
+}
+
+@media (hover: hover) {
+  .sw-btn-secondary:hover:not(:disabled) {
+    transform: translate3d(0, -1px, 0);
+    background-color: #eef0ea;
+    box-shadow: 0 8px 18px -12px rgb(23 60 47 / 0.4);
+  }
+}
+
+.sw-btn-secondary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* ── Destructive actions: restrained rose, never a lime CTA ───────────── */
+
+.sw-btn-danger {
+  min-height: 44px;
+  color: var(--sw-err);
+  border-color: #e8c6bf;
+  transition:
+    background-color var(--sw-t-fast) linear,
+    border-color var(--sw-t-fast) linear,
+    box-shadow var(--sw-t-mid) var(--sw-ease);
+}
+
+@media (hover: hover) {
+  .sw-btn-danger:hover:not(:disabled) {
+    background-color: var(--ws-err-bg, #fbeeeb);
+    border-color: var(--sw-err);
+    box-shadow: 0 8px 18px -12px rgb(155 50 38 / 0.45);
+  }
+}
+
+/* ── Text links & icon buttons ────────────────────────────────────────── */
+
+.sw-link {
+  border-radius: 4px;
+  transition: color var(--sw-t-fast) linear;
+}
+
+.sw-link svg {
+  transition: transform var(--sw-t-mid) var(--sw-ease);
+}
+
+@media (hover: hover) {
+  .sw-link:hover svg {
+    transform: translateX(3px);
+  }
+}
+
+/* ── Form controls: calm rest, emerald focus ──────────────────────────── */
+
+.sw-input,
+.sw-select,
+.sw-textarea {
+  transition:
+    border-color var(--sw-t-fast) linear,
+    box-shadow var(--sw-t-fast) linear,
+    background-color var(--sw-t-fast) linear;
+}
+
+.sw-input:hover:not(:disabled):not(:focus),
+.sw-select:hover:not(:disabled):not(:focus),
+.sw-textarea:hover:not(:disabled):not(:focus) {
+  border-color: var(--sw-faint);
+}
+
+.sw-input:focus,
+.sw-select:focus,
+.sw-textarea:focus {
+  outline: none;
+  border-color: var(--sw-forest);
+  box-shadow: 0 0 0 3px rgb(197 232 108 / 0.28);
+}
+
+/* ── Tabs / pills: clear selected state distinct from hover ───────────── */
+
+.sw-tab {
+  transition:
+    border-color var(--sw-t-fast) linear,
+    background-color var(--sw-t-fast) linear,
+    color var(--sw-t-fast) linear,
+    box-shadow var(--sw-t-mid) var(--sw-ease);
+}
+
+@media (hover: hover) {
+  .sw-tab:hover:not(:disabled):not([aria-pressed="true"]):not(.is-active) {
+    border-color: var(--sw-faint);
+    box-shadow: 0 6px 16px -10px rgb(23 60 47 / 0.35);
+  }
+}
+
+/* ── Checklist rows: smooth state change ──────────────────────────────── */
+
+.sw-check {
+  transition:
+    border-color var(--sw-t-fast) linear,
+    background-color var(--sw-t-mid) var(--sw-ease);
+}
+
+/* ── One focus language for the whole workspace ───────────────────────── */
+
+.sw :focus-visible {
+  outline: 2px solid var(--sw-forest);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Reduced motion + small screens ───────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .sw-enter {
+    animation: none;
+  }
+  .sw-card,
+  .sw-card::before,
+  .sw-lift,
+  .sw-btn,
+  .sw-btn svg,
+  .sw-btn-secondary,
+  .sw-btn-danger,
+  .sw-link,
+  .sw-link svg,
+  .sw-tab,
+  .sw-check,
+  .sw-input,
+  .sw-select,
+  .sw-textarea {
+    transition: none;
+    animation: none;
+  }
+  .sw-card:hover,
+  .sw-btn:hover:not(:disabled),
+  .sw-btn-secondary:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .sw-card:hover,
+  .sw-lift:hover {
+    box-shadow:
+      0 2px 4px rgb(32 40 34 / 0.05),
+      0 14px 28px -18px rgb(23 60 47 / 0.35);
+  }
+}

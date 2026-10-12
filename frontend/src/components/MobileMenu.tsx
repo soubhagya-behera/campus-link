@@ -86,7 +86,7 @@ export default function MobileMenu({
         )}
         {showRecruiterNote ? (
           <p className="px-3 py-2 text-xs leading-relaxed text-[var(--ws-mute)]">
-            Recruiter workflows are API-only in this build. Contact your placement cell.
+            No recruiter portal for this account. Contact your placement cell.
           </p>
         ) : null}
         <div className="my-1 border-t border-[var(--ws-line)]" role="separator" />

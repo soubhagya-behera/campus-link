@@ -33,7 +33,7 @@ export default function RecruitersSection() {
                 </div>
               ))}
               <p className="cl-note" style={{ gridColumn: "1 / -1", margin: 0 }}>
-                Figures fill in when the workspace is connected.
+                Live batch figures are shown inside the Placement Tower workspace.
               </p>
             </div>
           </Reveal>

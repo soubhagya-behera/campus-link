@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Undo2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge, Card, DemoTag, Empty, ErrorState, Loading, NoStudentState, SectionTitle } from "../components/ui";
+import "../components/student.css";
 import { api } from "../lib/server";
 import { useApplications, useSessionUser } from "../store/session";
 
@@ -55,7 +56,7 @@ export default function Applications() {
   const apps = applications.data ?? [];
 
   return (
-    <div>
+    <div className="sw sw-enter">
       <SectionTitle
         kicker="Applications"
         title="Every application, every next step"
@@ -70,7 +71,7 @@ export default function Applications() {
           action={
             <Link
               to="/mirror"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-signal-400 px-3 py-2 text-sm font-semibold text-ink-950"
+              className="sw-btn inline-flex items-center gap-1.5 rounded-lg bg-signal-400 px-3 py-2 text-sm font-semibold text-ink-950"
             >
               Browse matches <ArrowRight size={14} />
             </Link>
@@ -79,7 +80,7 @@ export default function Applications() {
       ) : (
         <div className="space-y-3">
           {apps.map((a) => (
-            <Card key={a.id} className="rise">
+            <Card key={a.id} className="rise sw-card">
               <div className="flex flex-wrap items-center gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-white">{a.job.title}</p>
@@ -93,14 +94,14 @@ export default function Applications() {
                   <button
                     onClick={() => withdraw.mutate(a.id)}
                     disabled={withdraw.isPending}
-                    className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2.5 py-1.5 text-xs font-medium text-slate-400 hover:border-white/25 hover:text-white disabled:opacity-50"
+                    className="sw-btn-danger inline-flex items-center gap-1 rounded-lg border border-white/10 px-2.5 py-1.5 text-xs font-medium text-slate-400 hover:border-white/25 hover:text-white disabled:opacity-50"
                   >
                     <Undo2 size={12} /> Withdraw
                   </button>
                 )}
               </div>
               <p className="mt-2 rounded-lg border border-white/8 bg-white/[0.02] p-2.5 font-mono text-[11px] text-slate-500">
-                record {a.id} · updated {a.updatedAt.slice(0, 10)}
+                updated {a.updatedAt.slice(0, 10)}
               </p>
             </Card>
           ))}

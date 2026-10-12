@@ -41,7 +41,9 @@
   --cl-on-signal: #173c2f;
 
   /* ── Spacing ────────────────────────────────────────────────────────── */
-  --cl-gutter: clamp(1.25rem, 4.5vw, 4.5rem);
+  /* The 1rem floor only engages below ~444px, tightening the phone gutter
+     without changing any wider layout. */
+  --cl-gutter: clamp(1rem, 4.5vw, 4.5rem);
   --cl-max: 82rem;
   --cl-section-y: clamp(4rem, 6.5vw, 7rem);
   --cl-section-y-lg: clamp(4.5rem, 8vw, 9rem);

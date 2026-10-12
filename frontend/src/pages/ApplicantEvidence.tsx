@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { Badge, Card } from "../components/ui";
+import "../components/staff.css";
 import type { ApplicationRecord, AttemptRecord, ProjectRecord } from "../lib/server";
 
 export interface ArenaRound {
@@ -38,7 +39,7 @@ function ExpandableList<T>({
         <button
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
-          className="mt-2 inline-flex min-h-[44px] items-center gap-1 text-sm font-semibold text-[var(--ws-forest)] hover:underline"
+          className="mt-2 inline-flex min-h-[44px] items-center gap-1 text-sm font-semibold text-[var(--ws-forest)] hover:underline st-link"
         >
           {open ? "Show less" : expandLabel(items.length)}
           <ChevronDown size={14} aria-hidden="true" className={open ? "rotate-180" : ""} />
@@ -86,7 +87,7 @@ export default function ApplicantEvidence({
 
 export function ProjectsCard({ projects }: { projects: ProjectRecord[] }) {
   return (
-    <Card className="p-5">
+    <Card className="st-card p-5">
       <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--ws-faint)]">
         Projects · {projects.length}
       </p>
@@ -124,7 +125,7 @@ export function ProjectsCard({ projects }: { projects: ProjectRecord[] }) {
 
 export function SprintCard({ evaluated }: { evaluated: AttemptRecord[] }) {
   return (
-    <Card className="p-5">
+    <Card className="st-card p-5">
       <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--ws-faint)]">
         Skill Sprint · {evaluated.length} evaluated
       </p>
@@ -160,7 +161,7 @@ export function ArenaCard({ arena }: { arena: ArenaRound[] }) {
   const bestArena = scoredArena.reduce((m, s) => Math.max(m, s.score ?? 0), 0);
   const latestArena = scoredArena[0];
   return (
-    <Card className="p-5">
+    <Card className="st-card p-5">
       <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--ws-faint)]">
         Interview Arena · {scoredArena.length} practice rounds
       </p>
@@ -196,7 +197,7 @@ export function ArenaCard({ arena }: { arena: ArenaRound[] }) {
 
 export function HistoryCard({ history }: { history: ApplicationRecord[] }) {
   return (
-    <Card className="p-5">
+    <Card className="st-card p-5">
       <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--ws-faint)]">
         Application history · {history.length}
       </p>

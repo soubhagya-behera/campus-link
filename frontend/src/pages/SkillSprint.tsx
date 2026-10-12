@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, ChevronDown, Circle, Clock3, Send, Trophy } from "lucide-react";
 import { useState } from "react";
 import { Badge, Card, DemoTag, Empty, ErrorState, Loading, Meter, NoStudentState, SectionTitle } from "../components/ui";
+import "../components/student.css";
 import SprintResult from "./SprintResult";
 import { challengeContent } from "../data/challenges";
 import { cn } from "../lib/cn";
@@ -163,7 +164,7 @@ export default function SkillSprint() {
   };
 
   return (
-    <div>
+    <div className="sw sw-enter">
       <SectionTitle
         kicker="Skill Sprint"
         title="Build skills. Show your work."
@@ -186,7 +187,7 @@ export default function SkillSprint() {
               aria-pressed={selected}
               aria-label={`View challenge: ${displayTitle(s.id, s.title)}`}
               className={cn(
-                "rounded-[14px] border p-4 text-left transition-colors",
+                "sw-tab rounded-[14px] border p-4 text-left transition-colors",
                 selected
                   ? "border-[var(--ws-forest)] bg-[var(--ws-surface)] shadow-[0_1px_2px_rgb(32_40_34/0.04),0_2px_8px_-4px_rgb(32_40_34/0.08)]"
                   : "border-[var(--ws-line)] bg-[var(--ws-surface)] hover:border-[var(--ws-forest)]",
@@ -221,7 +222,7 @@ export default function SkillSprint() {
       </div>
 
       {/* 2–3 · read + do */}
-      <Card className="rise mt-4">
+      <Card className="rise mt-4 sw-card">
         <div className="flex flex-wrap items-center gap-2">
           <Badge tone="signal">rewards {active.rewardSkill}</Badge>
           <span className="inline-flex items-center gap-1 font-mono text-[11px] text-[var(--ws-faint)]">
@@ -253,7 +254,7 @@ export default function SkillSprint() {
                   onClick={() => setChecked((c) => c.map((v, j) => (j === i ? !v : v)))}
                   aria-pressed={isChecked}
                   className={cn(
-                    "flex w-full items-start gap-3 rounded-xl border p-3 text-left transition-colors",
+                    "sw-check flex w-full items-start gap-3 rounded-xl border p-3 text-left transition-colors",
                     isChecked
                       ? "border-[var(--ws-forest)] bg-[var(--ws-lime-wash)]"
                       : "border-[var(--ws-line)] bg-[var(--ws-surface)]",
@@ -287,7 +288,7 @@ export default function SkillSprint() {
       </Card>
 
       {/* 4–6 · submit + result */}
-      <Card className="rise mt-4">
+      <Card className="rise mt-4 sw-card">
         {showForm ? (
           <div>
             <h3 className="font-display text-base font-bold text-[var(--ws-ink)]">Submit your work</h3>
@@ -302,7 +303,7 @@ export default function SkillSprint() {
                   inputMode="url"
                   autoComplete="off"
                   spellCheck={false}
-                  className="mt-1 min-h-[44px] w-full rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-3 py-2 text-sm text-[var(--ws-ink)]"
+                  className="sw-input mt-1 min-h-[44px] w-full rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-3 py-2 text-sm text-[var(--ws-ink)]"
                 />
               </label>
               <label className="block text-sm font-medium text-[var(--ws-ink)]">
@@ -312,7 +313,7 @@ export default function SkillSprint() {
                   onChange={(e) => setNote(e.target.value)}
                   rows={3}
                   placeholder="The trickiest call was… I chose X over Y because…"
-                  className="mt-1 min-h-[44px] w-full rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-3 py-2 text-sm leading-relaxed text-[var(--ws-ink)]"
+                  className="sw-textarea mt-1 min-h-[44px] w-full rounded-lg border border-[var(--ws-line)] bg-[var(--ws-surface)] px-3 py-2 text-sm leading-relaxed text-[var(--ws-ink)]"
                 />
               </label>
             </div>
@@ -324,7 +325,7 @@ export default function SkillSprint() {
             <button
               onClick={trySubmit}
               disabled={submit.isPending}
-              className="mt-3 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-signal-400 px-4 py-2.5 text-sm font-semibold text-ink-950 hover:bg-signal-300 disabled:opacity-50"
+              className="sw-btn mt-3 inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-signal-400 px-4 py-2.5 text-sm font-semibold text-ink-950 hover:bg-signal-300 disabled:opacity-50"
             >
               <Send size={14} aria-hidden="true" /> {submit.isPending ? "Submitting…" : "Submit for review"}
             </button>
@@ -361,7 +362,7 @@ export default function SkillSprint() {
             )}
             <button
               onClick={openForm}
-              className="mt-3 inline-flex min-h-[44px] items-center gap-1 text-sm font-semibold text-[var(--ws-forest)] hover:underline"
+              className="sw-link mt-3 inline-flex min-h-[44px] items-center gap-1 text-sm font-semibold text-[var(--ws-forest)] hover:underline"
             >
               Submit another attempt <ChevronDown size={14} className="-rotate-90" aria-hidden="true" />
             </button>

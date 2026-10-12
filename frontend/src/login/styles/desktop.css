@@ -1,0 +1,163 @@
+/* ============================================================================
+   Sign-in desktop refinement (≥1024px only — mobile is untouched).
+   Mirrors the registration split panel: form LEFT, full-height photo column
+   RIGHT with the clean photograph on top and a separate solid evergreen
+   surface below for brand + headline + tagline (no overlay wash over the
+   face, exactly like .rg-panel). The form primitives (.rg-*) are shared with
+   registration, so every form rule is scoped to .lg: registration keeps its
+   exact appearance. Hover-only effects sit behind (hover: hover).
+   ========================================================================= */
+
+@media (min-width: 1024px) {
+  /* ── Full-height panel: photo top (52%), solid evergreen body below. ── */
+  .lg-aside {
+    padding: 0;
+    min-height: 0;
+    display: flex;
+  }
+
+  .lg-panel {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    border-radius: 0;
+    background: var(--rg-forest);
+    box-shadow: none;
+  }
+
+  /* Same 1536×1024 photograph, same framing as registration: face kept
+     left-of-centre and high in the frame, hands visible, no distortion. */
+  .lg-panel-media {
+    position: relative;
+    inset: auto;
+    flex: 0 0 52%;
+    min-height: 0;
+    width: 100%;
+    object-position: 48% 30%;
+  }
+
+  /* No wash over the photograph on desktop; the body below is solid
+     evergreen, so brand and headline stay readable on their own surface. */
+  .lg-panel::after,
+  .lg-panel::before {
+    display: none;
+  }
+
+  .lg-panel-body {
+    position: static;
+    flex: 1 1 auto;
+    height: auto;
+    justify-content: center;
+    gap: 0.9rem;
+    background: var(--rg-forest);
+    padding: clamp(1.5rem, 2.5vw, 2.5rem);
+  }
+
+  .lg-caption-line {
+    font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.1rem);
+    max-width: 16ch;
+  }
+
+  .lg-caption-sub {
+    display: block;
+  }
+
+  /* ── Primary button: visible evergreen/lime glow at rest, stronger hover. ── */
+  .lg .rg-btn--block {
+    box-shadow:
+      0 10px 24px -12px rgb(23 60 47 / 0.55),
+      0 0 0 1px rgb(197 232 108 / 0.35),
+      0 0 18px -4px rgb(197 232 108 / 0.45);
+    transition:
+      background-color var(--rg-t-fast) linear,
+      box-shadow var(--rg-t-mid) var(--rg-ease),
+      transform var(--rg-t-fast) var(--rg-ease);
+  }
+  .lg .rg-btn--block:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--rg-canvas),
+      0 0 0 4px var(--rg-forest);
+  }
+  .lg .rg-btn--block:disabled {
+    box-shadow: none;
+    transform: none;
+  }
+
+  /* ── Inputs: polished border/background, soft focus ring on the field. ── */
+  .lg .rg-input {
+    background: var(--rg-surface);
+    transition:
+      border-color var(--rg-t-fast) linear,
+      box-shadow var(--rg-t-fast) linear,
+      background-color var(--rg-t-fast) linear;
+  }
+  .lg .rg-input:focus {
+    border-color: var(--rg-forest);
+    box-shadow: 0 0 0 3px rgb(197 232 108 / 0.28);
+  }
+  .lg .rg-input:disabled {
+    background: var(--rg-line-soft);
+  }
+  .lg .rg-reveal:hover {
+    color: var(--rg-forest);
+  }
+
+  /* ── Supporting links: matching hover + keyboard affordance. ── */
+  .lg-foot-link {
+    border-radius: var(--rg-r-xs);
+    transition:
+      background-size var(--rg-t-mid) var(--rg-ease),
+      color var(--rg-t-fast) linear;
+  }
+  .lg-foot-link:hover {
+    color: var(--rg-lime-ink);
+  }
+  .lg-foot-link:focus-visible {
+    outline: 2px solid var(--rg-forest);
+    outline-offset: 3px;
+  }
+
+  /* ── Composition: keep the short card optically centred. ── */
+  .lg-card {
+    max-width: 26rem;
+  }
+}
+
+@media (min-width: 1024px) and (hover: hover) {
+  .lg .rg-btn--block:hover:not(:disabled) {
+    background: var(--rg-forest-2);
+    transform: translateY(-2px);
+    box-shadow:
+      0 16px 34px -12px rgb(23 60 47 / 0.6),
+      0 0 0 1px rgb(197 232 108 / 0.65),
+      0 0 30px -4px rgb(197 232 108 / 0.6);
+  }
+  .lg .rg-btn--block:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow:
+      0 6px 16px -10px rgb(23 60 47 / 0.55),
+      0 0 0 1px rgb(197 232 108 / 0.35);
+  }
+  .lg .rg-input:hover:not(:disabled):not(:focus) {
+    border-color: var(--rg-sage);
+    box-shadow: 0 0 0 3px rgb(197 232 108 / 0.14);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lg .rg-btn--block,
+  .lg .rg-input,
+  .lg-foot-link {
+    transition: none;
+  }
+  .lg .rg-btn--block:hover:not(:disabled),
+  .lg .rg-btn--block:active:not(:disabled) {
+    transform: none;
+  }
+}

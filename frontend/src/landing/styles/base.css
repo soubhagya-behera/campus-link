@@ -332,3 +332,21 @@
   opacity: 1;
   transform: none;
 }
+
+/* ────────────────────────────────────────── phone width (≤620px) ──────── */
+
+@media (max-width: 620px) {
+  /* The ch-based measures leave a dead column on the right at 375–393px.
+     On phones the gutter itself is the readable measure. */
+  .cl-lede,
+  .cl-body {
+    max-width: none;
+  }
+  /* Grid children default to min-width: auto, which lets a long word or
+     figure force horizontal overflow; allow them to shrink on phones. */
+  .cl-hero-grid > *,
+  .cl-proof > *,
+  .cl-placement > * {
+    min-width: 0;
+  }
+}

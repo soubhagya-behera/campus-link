@@ -115,8 +115,7 @@ export default function LoginForm({ values, errors, serverError, busy, onChange,
       </button>
 
       <p className="lg-note">
-        Forgot your password? Account recovery is not available in this build — contact your
-        placement cell.
+        Forgot your password? Contact your placement cell for help signing in.
       </p>
     </form>
   );

@@ -61,7 +61,6 @@ export default function LandingFooter() {
 
         <div className="cl-foot-bottom">
           <span>CAMPUSLINK / Career Intelligence</span>
-          <span>Accounts are not enabled in this build yet, so both links open the workspace.</span>
         </div>
       </div>
     </footer>
