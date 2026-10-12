@@ -1,0 +1,118 @@
+/* ============================================================================
+   Six-digit code entry.
+
+   Six real inputs rather than one, because each digit needs its own label and
+   its own focus target for screen-reader and keyboard users. Cells are 3.25rem
+   square with 0.5rem gaps, which keeps all six inside 320px minus gutters.
+   ========================================================================= */
+
+.rg-otp {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+}
+
+.rg-otp-cell {
+  width: 100%;
+  min-width: 0;
+  height: 3.5rem;
+  padding: 0;
+  border: 1px solid var(--rg-line);
+  border-radius: var(--rg-r-sm);
+  background: var(--rg-surface);
+  color: var(--rg-forest);
+  font-family: var(--rg-mono);
+  font-size: 1.375rem;
+  font-weight: 500;
+  text-align: center;
+  transition:
+    border-color var(--rg-t-fast) linear,
+    box-shadow var(--rg-t-fast) linear;
+}
+
+.rg-otp-cell:hover:not(:disabled) {
+  border-color: var(--rg-sage);
+}
+
+.rg-otp-cell:focus {
+  outline: none;
+  border-color: var(--rg-forest);
+  box-shadow: var(--rg-focus);
+}
+
+/* The cell that is about to receive the next digit. */
+.rg-otp-cell.is-next {
+  border-color: var(--rg-sage);
+}
+
+.rg-otp-cell.is-filled {
+  border-color: var(--rg-forest);
+}
+
+.rg-otp-cell.is-invalid {
+  border-color: var(--rg-danger);
+}
+
+.rg-otp-cell:disabled {
+  background: var(--rg-canvas);
+  color: var(--rg-sage);
+  cursor: not-allowed;
+}
+
+.rg-otp-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.8125rem;
+}
+
+.rg-otp-count {
+  font-family: var(--rg-mono);
+  font-size: 0.75rem;
+  color: var(--rg-sage-deep);
+}
+
+.rg-otp-count.is-live {
+  color: var(--rg-forest);
+}
+
+.rg-text-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.1rem;
+  border: 0;
+  background: none;
+  color: var(--rg-forest);
+  font-family: var(--rg-ui);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--rg-r-xs);
+  transition: color var(--rg-t-fast) linear;
+}
+
+.rg-text-btn:hover:not(:disabled) {
+  color: var(--rg-lime-ink);
+}
+
+.rg-text-btn:disabled {
+  color: var(--rg-sage);
+  cursor: not-allowed;
+}
+
+@media (max-width: 359px) {
+  .rg-otp {
+    gap: 0.3rem;
+  }
+
+  .rg-otp-cell {
+    height: 3rem;
+    font-size: 1.125rem;
+    border-radius: var(--rg-r-xs);
+  }
+}

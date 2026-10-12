@@ -1,0 +1,141 @@
+/* ============================================================================
+   The sign-in image card: same photograph as registration, framed rather than
+   full-bleed, with a shallower wash because the caption is short. The crop
+   sits near 48% across, which keeps the student's face and hands in frame on
+   a portrait crop (see the crop notes in register/styles/panel.css).
+   ========================================================================= */
+
+.lg-aside {
+  padding: clamp(1rem, 2vw, 1.75rem) clamp(1rem, 2vw, 1.75rem) clamp(1rem, 2vw, 1.75rem) 0;
+  min-height: 0;
+}
+
+.lg-panel {
+  position: relative;
+  height: 100%;
+  min-height: clamp(420px, 82vh, 760px);
+  overflow: hidden;
+  border-radius: var(--rg-r-lg);
+  background: var(--rg-forest);
+}
+
+.lg-panel-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 48% 50%;
+}
+
+.lg-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgb(23 60 47 / 0.88) 0%,
+    rgb(23 60 47 / 0.5) 30%,
+    rgb(23 60 47 / 0) 58%
+  );
+}
+
+.lg-panel-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: clamp(1.25rem, 2vw, 2rem);
+  color: #f5f4ee;
+}
+
+.lg-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.lg-mark {
+  width: 30px;
+  height: 30px;
+  color: #f5f4ee;
+}
+
+.lg-brand-name {
+  font-family: var(--rg-display);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.lg-caption-line {
+  margin: 0 0 0.35rem;
+  font-family: var(--rg-display);
+  font-size: clamp(1.25rem, 1rem + 0.9vw, 1.6rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.lg-caption-sub {
+  margin: 0;
+  font-family: var(--rg-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgb(245 244 238 / 0.72);
+}
+
+@media (max-width: 1023px) {
+  .lg-aside {
+    padding: 0;
+  }
+
+  .lg-panel {
+    min-height: 0;
+    height: clamp(190px, 26vh, 280px);
+    border-radius: 0;
+  }
+
+  .lg-panel-media {
+    object-position: 50% 30%;
+  }
+
+  .lg-panel-body {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem clamp(1rem, 4.5vw, 2.5rem) 1.25rem;
+  }
+
+  .lg-caption-sub {
+    display: none;
+  }
+
+  .lg-caption-line {
+    font-size: clamp(1.05rem, 1rem + 0.8vw, 1.3rem);
+    max-width: 22ch;
+  }
+
+  .lg-mark {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+@media (max-width: 639px) {
+  .lg-panel {
+    height: 168px;
+  }
+
+  .lg-brand-name {
+    font-size: 0.75rem;
+  }
+}

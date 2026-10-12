@@ -1,0 +1,53 @@
+/* ============================================================================
+   CAMPUSLINK — public-page design tokens (registration .rg, login .lg)
+   Scoped to the page roots, so the landing page (.cl) and the authenticated
+   app (src/app.css) are both untouched. Same palette and typefaces as the
+   landing revision — this is one design system, not a new one. Login imports
+   this file and scopes its own page to .lg; nothing may restyle .rg from
+   outside.
+   ========================================================================= */
+
+.rg,
+.lg {
+  /* ── Surfaces and ink ────────────────────────────────────────────────── */
+  --rg-canvas: #f5f4ee; /* warm canvas — the form panel */
+  --rg-surface: #ffffff; /* clean surface — inputs, the OTP cells */
+  --rg-forest: #173c2f; /* deep forest — primary button, headings */
+  --rg-forest-2: #1f4c3b;
+  --rg-ink: #202822; /* dark ink — labels and body */
+  --rg-mute: #4f5c50; /* secondary text, 6.6:1 on canvas */
+  --rg-sage: #849581; /* muted sage — hints, decorative hairlines */
+  --rg-sage-deep: #5f7160;
+  --rg-line: #dde2d8; /* soft border */
+  --rg-line-soft: #e9ece3;
+
+  /* ── Signal: the active step marker and focus details only ──────────── */
+  --rg-lime: #c5e86c;
+  --rg-lime-ink: #3f5417;
+  --rg-lime-wash: rgb(197 232 108 / 0.16);
+
+  /* ── Status ──────────────────────────────────────────────────────────── */
+  --rg-danger: #9b3226;
+  --rg-danger-wash: #fbeeeb;
+  --rg-danger-line: #e8c6bf;
+
+  /* ── Type ────────────────────────────────────────────────────────────── */
+  --rg-display: var(--font-syne);
+  --rg-ui: var(--font-manrope);
+  --rg-mono: var(--font-plex);
+
+  /* ── Space and shape ─────────────────────────────────────────────────── */
+  --rg-r-xs: 4px;
+  --rg-r-sm: 8px;
+  --rg-r-md: 12px;
+  --rg-r-lg: 18px;
+
+  --rg-shadow-sm: 0 1px 2px rgb(32 40 34 / 0.04), 0 2px 8px -4px rgb(32 40 34 / 0.08);
+  --rg-shadow-md: 0 2px 4px rgb(32 40 34 / 0.04), 0 18px 40px -22px rgb(32 40 34 / 0.28);
+  --rg-focus: 0 0 0 3px var(--rg-lime-wash);
+
+  /* ── Motion ──────────────────────────────────────────────────────────── */
+  --rg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --rg-t-fast: 140ms;
+  --rg-t-mid: 280ms;
+}

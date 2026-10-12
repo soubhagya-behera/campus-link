@@ -12,6 +12,7 @@ import assessmentsRouter from "./routes/assessments.js";
 import attemptsRouter from "./routes/attempts.js";
 import healthRouter from "./routes/health.js";import opportunitiesRouter from "./routes/opportunities.js";
 import passportRouter from "./routes/passport.js";
+import registerRouter from "./routes/register.js";
 import studentsRouter from "./routes/students.js";
 import towerRouter from "./routes/tower.js";
 
@@ -60,6 +61,8 @@ export function createApp() {
 
   app.use("/api", healthRouter);
   app.use("/api/auth", authRouter);
+  // Public, unauthenticated student registration (email-verified signup).
+  app.use("/api/auth/register", registerRouter);
   app.use("/api/students", studentsRouter);
   app.use("/api/students", passportRouter);
   app.use("/api/opportunities", opportunitiesRouter);

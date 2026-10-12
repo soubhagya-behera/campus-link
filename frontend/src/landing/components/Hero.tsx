@@ -37,7 +37,7 @@ export default function Hero() {
           </p>
 
           <div className="cl-hero-actions cl-fade-up" style={{ "--d": "500ms" } as CSSProperties}>
-            <Link className="cl-btn cl-btn--primary cl-btn--lg" to="/app">
+            <Link className="cl-btn cl-btn--primary cl-btn--lg" to="/register">
               Get started <Arrow />
             </Link>
             <a className="cl-link" href="#journey">

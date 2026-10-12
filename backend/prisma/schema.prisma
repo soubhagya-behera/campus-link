@@ -99,6 +99,43 @@ model Session {
   @@index([expiresAt])
 }
 
+/// A public, student-only signup in progress. The final `User` row is created
+/// only after the emailed OTP is verified AND a password is accepted, so
+/// "we sent you a code" never implies an account exists.
+///
+/// Secrets are never stored: `otpHash` is an HMAC (see lib/otp.ts) and
+/// `completionTokenHash` is a SHA-256 like the session table. `activeEmail`
+/// carries the normalised email while the attempt is live and is set to NULL
+/// once consumed — the unique index therefore allows exactly one in-flight
+/// attempt per email while still permitting unlimited completed history.
+model RegistrationAttempt {
+  id                  String    @id @default(cuid())
+  activeEmail         String?   @unique
+  email               String
+  fullName            String
+  enrollmentNo        String
+  branch              String
+  graduationYear      Int
+  institution         String?
+  otpHash             String?
+  otpExpiresAt        DateTime?
+  verifyAttempts      Int       @default(0)
+  maxVerifyAttempts   Int       @default(5)
+  sendCount           Int       @default(0)
+  resendAvailableAt   DateTime  @default(now())
+  verifiedAt          DateTime?
+  completionTokenHash String?
+  completionExpiresAt DateTime?
+  consumedAt          DateTime?
+  ip                  String?
+  userAgent           String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([email])
+  @@index([consumedAt])
+}
+
 model StudentProfile {
   id             String   @id @default(cuid())
   userId         String   @unique
@@ -109,6 +146,8 @@ model StudentProfile {
   graduationYear Int?
   cgpa           Float?
   resumeUrl      String?
+  /// College / institution, captured at public registration (step 1).
+  institution    String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -171,28 +210,28 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  jobs JobOpportunity[]
+  jobs  JobOpportunity[]
   users User[]
 }
 
 model JobOpportunity {
-  id          String    @id @default(cuid())
-  companyId   String
-  title       String
-  description String
-  location    String?
-  type        JobType   @default(FULL_TIME)
-  status      JobStatus @default(OPEN)
+  id             String    @id @default(cuid())
+  companyId      String
+  title          String
+  description    String
+  location       String?
+  type           JobType   @default(FULL_TIME)
+  status         JobStatus @default(OPEN)
   /// Informational role seniority (e.g. Intern, Junior). Not used in matching.
-  seniority   String?
-  salary      String?
-  deadline    DateTime?
+  seniority      String?
+  salary         String?
+  deadline       DateTime?
   /// Explicit hiring criteria: [{ "skill": "React", "minLevel": "INTERMEDIATE" }].
   /// Stored on the record so every match score is inspectable, never a black box.
-  requiredSkills Json     @default("[]")
-  niceToHave     String[] @default([])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  requiredSkills Json      @default("[]")
+  niceToHave     String[]  @default([])
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   company Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   apps    Application[]

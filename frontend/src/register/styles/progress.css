@@ -1,0 +1,121 @@
+/* ============================================================================
+   Progress rail — three steps on one page, always visible above the form.
+   A completed node is solid forest; the active node carries the lime signal
+   dot; upcoming nodes stay quiet. No gradients, no glow.
+   ========================================================================= */
+
+.rg-rail {
+  margin-bottom: 1rem;
+}
+
+.rg-rail ol {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rg-step-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+/* Connector between nodes, drawn behind them. */
+.rg-step-item:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  top: 1.0625rem;
+  right: 50%;
+  left: -50%;
+  height: 1px;
+  background: var(--rg-line);
+}
+
+.rg-step-item.is-done:not(:first-child)::before,
+.rg-step-item.is-active:not(:first-child)::before {
+  background: var(--rg-sage);
+}
+
+.rg-node {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.125rem;
+  height: 2.125rem;
+  border-radius: 50%;
+  border: 1px solid var(--rg-line);
+  background: var(--rg-canvas);
+  font-family: var(--rg-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--rg-sage);
+}
+
+.rg-step-item.is-active .rg-node {
+  border-color: var(--rg-forest);
+  color: var(--rg-forest);
+  background: var(--rg-surface);
+  box-shadow: var(--rg-focus);
+}
+
+/* The one place lime appears in the rail: the active step marker. */
+.rg-step-item.is-active .rg-node::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--rg-lime);
+  border: 2px solid var(--rg-canvas);
+}
+
+.rg-step-item.is-done .rg-node {
+  border-color: var(--rg-forest);
+  background: var(--rg-forest);
+  color: var(--rg-canvas);
+}
+
+.rg-step-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--rg-sage);
+}
+
+.rg-step-item.is-active .rg-step-label {
+  color: var(--rg-forest);
+}
+
+.rg-step-item.is-done .rg-step-label {
+  color: var(--rg-mute);
+}
+
+@media (max-width: 639px) {
+  .rg-step-item {
+    gap: 0.4rem;
+  }
+
+  .rg-node {
+    width: 1.875rem;
+    height: 1.875rem;
+    font-size: 0.6875rem;
+  }
+
+  .rg-step-item:not(:first-child)::before {
+    top: 0.9375rem;
+  }
+
+  .rg-step-label {
+    /* Comfortable to read, still fits three across a 320px screen. */
+    font-size: 0.75rem;
+  }
+}

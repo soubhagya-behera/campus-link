@@ -1,6 +1,8 @@
+// The backend binds to IPv4-only 127.0.0.1, so the fallback must too:
+// on Windows `localhost` can resolve to ::1 and refuse the connection.
 const BASE =
   (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, "") ||
-  "http://localhost:4000";
+  "http://127.0.0.1:4000";
 
 export const API_BASE = BASE;
 

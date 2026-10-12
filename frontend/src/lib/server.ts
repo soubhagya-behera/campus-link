@@ -15,15 +15,21 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+async function requestImpl<T>(path: string, init?: RequestInit): Promise<T> {
   let res: Response;
   try {
     res = await fetch(`${API_BASE}${path}`, {
       ...init,
+      // The API is on a different port from this page, so every call is
+      // cross-origin. Without this the browser drops the HttpOnly session
+      // cookie that /login and /register/complete set, and no request is ever
+      // authenticated. Safe here because the session is the credential, not a
+      // token we attach by hand.
+      credentials: "include",
       headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
     });
   } catch {
-    throw new ApiError(0, "Cannot reach the API. Start the backend: cd backend; node dist/index.js");
+    throw new ApiError(0, "Cannot reach the API. Start it with `npm run dev` in the backend folder.");
   }
   const body = (await res.json().catch(() => null)) as {
     ok?: boolean;
@@ -36,6 +42,13 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
   return body as T;
 }
+
+/**
+ * Shared JSON request helper. Exported so the public pages (login, register)
+ * send cookies through exactly the same path as the authenticated app,
+ * instead of growing a second HTTP client with subtly different rules.
+ */
+export const request = requestImpl;
 
 export type Level = "BEGINNER" | "INTERMEDIATE" | "ADVANCED" | "EXPERT";
 
@@ -174,6 +187,18 @@ export interface StudentRow {
   projectCount: number;
 }
 
+/** Mirrors the Prisma `Role` enum; the server is the authority on all of it. */
+export type Role = "STUDENT" | "STAFF" | "RECRUITER" | "ADMIN";
+
+/** The caller's identity, exactly as `GET /api/auth/me` returns it. */
+export interface SessionUser {
+  id: string;
+  email: string;
+  role: Role;
+  companyId: string | null;
+  studentProfileId: string | null;
+}
+
 interface Envelope<T> {
   ok: boolean;
   data: T;
@@ -185,10 +210,24 @@ interface Envelope<T> {
 }
 
 export const api = {
-  demoIdentity(): Promise<{ studentProfileId: string; fullName: string }> {
-    return request<Envelope<{ studentProfileId: string; fullName: string }>>("/api/demo/identity").then(
-      (r) => r.data,
-    );
+  /** Current session, or a 401 ApiError when there is no live session. */
+  me(): Promise<SessionUser> {
+    return request<Envelope<{ user: SessionUser }>>("/api/auth/me").then((r) => r.data.user);
+  },
+  /**
+   * Exchange credentials for the HttpOnly session cookie. Rejects with a
+   * uniform 401 "Invalid email or password" for unknown, wrong or inactive
+   * accounts — deliberately the same message for all three.
+   */
+  login(email: string, password: string): Promise<SessionUser> {
+    return request<Envelope<{ user: SessionUser }>>("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+    }).then((r) => r.data.user);
+  },
+  /** Revokes the server-side session and clears the cookie. */
+  logout(): Promise<void> {
+    return request<{ ok: boolean }>("/api/auth/logout", { method: "POST" }).then(() => undefined);
   },
   profile(id: string): Promise<StudentProfile> {
     return request<Envelope<StudentProfile>>(`/api/students/${id}`).then((r) => r.data);

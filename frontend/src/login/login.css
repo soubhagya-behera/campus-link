@@ -1,0 +1,13 @@
+/* ============================================================================
+   CAMPUSLINK — sign-in page stylesheet.
+   Tokens (.lg shares the .rg palette) and the form primitives (.rg-input,
+   .rg-btn, .rg-alert, .rg-field) are imported from the registration page
+   verbatim — one design system, not two. Only the composition below is
+   login-specific: a compact framed panel beside a short form card.
+   ========================================================================= */
+
+@import "../register/styles/tokens.css";
+@import "../register/styles/form.css";
+@import "../register/styles/controls.css";
+@import "./styles/layout.css";
+@import "./styles/panel.css";

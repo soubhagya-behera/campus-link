@@ -56,7 +56,7 @@ export default function FinalCta() {
                   else builds on it.
                 </p>
                 <div className="cl-cta-actions" style={{ marginTop: "1.25rem" }}>
-                  <Link className="cl-btn cl-btn--primary cl-btn--lg" to="/app">
+                  <Link className="cl-btn cl-btn--primary cl-btn--lg" to="/register">
                     Get started <Arrow />
                   </Link>
                   <a className="cl-link" href="#journey">

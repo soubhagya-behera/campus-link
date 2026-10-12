@@ -3,7 +3,7 @@ import { ArrowRight, CalendarClock, Crosshair, ListChecks, Sparkles } from "luci
 import { Link } from "react-router-dom";
 import { Badge, Card, DemoTag, ErrorState, Loading, Meter, Ring, SectionTitle } from "../components/ui";
 import { ApiError } from "../lib/server";
-import { useApplications, useMatches, useProfile, useProfileId, useReadiness } from "../store/session";
+import { useApplications, useMatches, useProfile, useProfileId, useReadiness, useSessionUser } from "../store/session";
 import { api } from "../lib/server";
 
 function greeting(): string {
@@ -15,11 +15,39 @@ function greeting(): string {
 
 export default function Dashboard() {
   const profileId = useProfileId();
+  const user = useSessionUser();
   const profile = useProfile();
   const readiness = useReadiness();
   const matches = useMatches(3);
   const applications = useApplications();
   const qc = useQueryClient();
+
+  // Placement and recruiter accounts own no student profile, so the overview
+  // below can never load for them. Say so plainly instead of spinning forever.
+  if (user && !user.studentProfileId) {
+    return (
+      <div>
+        <SectionTitle kicker="Student overview" title="No student workspace here" right={<DemoTag />} />
+        <Card className="p-6">
+          <p className="text-sm leading-relaxed text-slate-300">
+            This account is signed in as <span className="font-semibold text-white">{user.email}</span> with
+            the {user.role} role, which is not linked to a student profile.{" "}
+            {user.role === "STAFF" || user.role === "ADMIN" ? (
+              <>
+                Your view of the batch lives in the{" "}
+                <Link to="/tower" className="font-semibold text-signal-300 hover:text-signal-400">
+                  Placement Tower
+                </Link>
+                .
+              </>
+            ) : (
+              "Ask your placement cell to link this account to a student profile."
+            )}
+          </p>
+        </Card>
+      </div>
+    );
+  }
 
   if (profile.isPending || readiness.isPending || matches.isPending || applications.isPending) {
     return (

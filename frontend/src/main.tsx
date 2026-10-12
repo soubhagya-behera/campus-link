@@ -5,6 +5,8 @@ import WorkspaceLayout from "./components/WorkspaceLayout.tsx";
 import "./app.css";
 import Landing from "./landing/Landing.tsx";
 import NotFound from "./landing/NotFound.tsx";
+import Login from "./login/Login.tsx";
+import Register from "./register/Register.tsx";
 import Applications from "./pages/Applications.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import CareerTwin from "./pages/CareerTwin.tsx";
@@ -17,14 +19,21 @@ import SkillSprint from "./pages/SkillSprint.tsx";
 /**
  * Routes:
  *   /            public landing page (no API dependency)
+ *   /login       public sign-in (no live session required to view)
+ *   /register    public student registration (email-verified signup)
  *   /app         student workspace overview
  *   /twin … /tower  the existing authenticated pages, unchanged
+ *
+ * /login and /register render OUTSIDE the session gate below, so a signed-out
+ * visitor can always reach them and no redirect loop is possible.
  */
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route element={<WorkspaceLayout />}>
           <Route path="app" element={<Dashboard />} />
           <Route path="twin" element={<CareerTwin />} />

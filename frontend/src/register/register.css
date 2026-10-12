@@ -1,0 +1,14 @@
+/* ============================================================================
+   CAMPUSLINK — registration page stylesheet
+   Imported only by src/register/Register.tsx. Colour and font tokens live in
+   the shared @theme block in src/app.css; the palette below mirrors the
+   landing tokens (src/landing/styles/tokens.css) so the two read as one brand.
+   ========================================================================= */
+
+@import "./styles/tokens.css";
+@import "./styles/layout.css";
+@import "./styles/panel.css";
+@import "./styles/progress.css";
+@import "./styles/form.css";
+@import "./styles/controls.css";
+@import "./styles/otp.css";

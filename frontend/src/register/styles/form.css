@@ -1,0 +1,245 @@
+﻿/* ============================================================================
+   Form fields: headings, grouping, labels, inputs, hints and errors.
+   Inputs are 48px tall on every breakpoint so touch targets stay comfortable.
+   Buttons, alerts and the requirement checklist live in controls.css.
+   ========================================================================= */
+
+.rg-eyebrow {
+  margin: 0 0 0.3rem;
+  font-family: var(--rg-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rg-sage-deep);
+}
+
+.rg-title {
+  margin: 0 0 0.35rem;
+  font-family: var(--rg-display);
+  font-size: clamp(1.375rem, 1.15rem + 1vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: var(--rg-forest);
+  text-wrap: balance;
+}
+
+.rg-lede {
+  margin: 0 0 0.9rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--rg-mute);
+  max-width: 52ch;
+}
+
+.rg-group {
+  margin: 0 0 0.9rem;
+  padding: 0;
+  border: 0;
+}
+
+.rg-group-legend {
+  display: block;
+  width: 100%;
+  margin: 0 0 0.55rem;
+  padding: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--rg-forest);
+}
+
+.rg-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 1rem;
+}
+
+@media (max-width: 479px) {
+  .rg-grid-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* â”€â”€ Field â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
+.rg-field {
+  margin-bottom: 0.65rem;
+  min-width: 0;
+}
+
+.rg-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--rg-ink);
+}
+
+.rg-optional {
+  margin-left: 0.35rem;
+  font-weight: 500;
+  font-size: 0.75rem;
+  color: var(--rg-sage);
+}
+
+.rg-input {
+  display: block;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--rg-line);
+  border-radius: var(--rg-r-sm);
+  background: var(--rg-surface);
+  color: var(--rg-ink);
+  font-family: var(--rg-ui);
+  font-size: 1rem;
+  /* 16px prevents iOS Safari from zooming the viewport on focus. */
+  line-height: 1.4;
+  transition:
+    border-color var(--rg-t-fast) linear,
+    box-shadow var(--rg-t-fast) linear;
+}
+
+.rg-input::placeholder {
+  color: var(--rg-sage);
+  opacity: 1;
+}
+
+.rg-input:hover:not(:disabled) {
+  border-color: var(--rg-sage);
+}
+
+.rg-input:focus {
+  outline: none;
+  border-color: var(--rg-forest);
+  box-shadow: var(--rg-focus);
+}
+
+.rg-input:disabled {
+  background: var(--rg-canvas);
+  color: var(--rg-mute);
+  cursor: not-allowed;
+}
+
+.rg-input.is-invalid {
+  border-color: var(--rg-danger);
+}
+
+.rg-input.is-invalid:focus {
+  box-shadow: 0 0 0 3px var(--rg-danger-wash);
+}
+
+/* Valid state: restrained green border plus a check icon and text — never
+   colour alone, and only for a completely valid value (see Field.tsx). */
+.rg-input.is-valid {
+  border-color: #4d7c4f;
+  padding-right: 2.5rem;
+}
+
+.rg-input.is-valid:focus {
+  border-color: #4d7c4f;
+  box-shadow: 0 0 0 3px rgb(77 124 79 / 0.16);
+}
+
+.rg-control {
+  position: relative;
+}
+
+.rg-check {
+  position: absolute;
+  right: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: #4d7c4f;
+  color: #fff;
+  pointer-events: none;
+}
+
+.rg-ok {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: #3c623e;
+}
+
+select.rg-input {
+  appearance: none;
+  padding-right: 2.25rem;
+  background-image: linear-gradient(45deg, transparent 50%, var(--rg-sage-deep) 50%),
+    linear-gradient(135deg, var(--rg-sage-deep) 50%, transparent 50%);
+  background-position: calc(100% - 1.15rem) 1.3rem, calc(100% - 0.8rem) 1.3rem;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+/* Password field: input plus a trailing visibility toggle. */
+.rg-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.rg-input-wrap .rg-input {
+  padding-right: 3.25rem;
+}
+
+.rg-reveal {
+  position: absolute;
+  right: 0.35rem;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: var(--rg-r-xs);
+  background: transparent;
+  color: var(--rg-sage-deep);
+  cursor: pointer;
+  transition: color var(--rg-t-fast) linear;
+}
+
+.rg-reveal:hover {
+  color: var(--rg-forest);
+}
+
+.rg-hint {
+  margin: 0.3rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--rg-sage-deep);
+}
+
+.rg-error {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--rg-danger);
+}
+
+.rg-error::before {
+  content: "!";
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.15rem;
+  border-radius: 50%;
+  background: var(--rg-danger);
+  color: var(--rg-surface);
+  font-size: 0.625rem;
+  font-weight: 700;
+}
+

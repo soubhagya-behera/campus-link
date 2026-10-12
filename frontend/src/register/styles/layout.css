@@ -1,0 +1,173 @@
+/* ============================================================================
+   Registration layout — editorial two-panel on desktop, stacked below it.
+
+   Desktop (≥ 1024px): image panel 42% / form panel 58%, the image pinned while
+   the form scrolls past it. The form itself is capped so it never stretches to
+   the width of a 1440px viewport.
+
+   Tablet and mobile: the image becomes a banner above the form rather than a
+   shrinking side column — a 300px-wide sliver of a landscape photograph is
+   neither legible nor attractive.
+   ========================================================================= */
+
+.rg {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 42fr) minmax(0, 58fr);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: clip;
+  background: var(--rg-canvas);
+  color: var(--rg-ink);
+  font-family: var(--rg-ui);
+  font-size: 1rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.rg ::selection {
+  background: var(--rg-lime);
+  color: var(--rg-forest);
+}
+
+.rg :focus-visible {
+  outline: 2px solid var(--rg-lime-ink);
+  outline-offset: 2px;
+  border-radius: var(--rg-r-xs);
+}
+
+.rg-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Form panel ───────────────────────────────────────────────────────── */
+
+.rg-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Asymmetric so the form sits on a comfortable optical centre rather than a
+     geometric one, and never closer than 1rem to any edge. */
+  padding: clamp(1.25rem, 3vw, 2.5rem) clamp(1rem, 4vw, 3.5rem);
+}
+
+.rg-card {
+  width: 100%;
+  /* Wide enough on a laptop that step 1 fits ~one viewport at 1366×768. */
+  max-width: 32rem;
+  margin-inline: auto;
+}
+
+.rg-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-top: 0.9rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--rg-line);
+  font-size: 0.875rem;
+}
+
+.rg-foot-note {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--rg-sage-deep);
+}
+
+.rg-foot-link {
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  font: inherit;
+  color: var(--rg-forest);
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  background-image: linear-gradient(var(--rg-sage), var(--rg-sage));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1.5px;
+  transition: background-size var(--rg-t-mid) var(--rg-ease);
+}
+.rg-foot-link:hover:not(:disabled) {
+  background-size: 100% 1.5px;
+}
+.rg-foot-link:disabled {
+  color: var(--rg-sage);
+  cursor: default;
+}
+
+/* ── Step transition: subtle, and never a slide ───────────────────────── */
+
+.rg-step {
+  animation: rg-step-in var(--rg-t-mid) var(--rg-ease) both;
+}
+
+@keyframes rg-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rg-step {
+    animation: none;
+  }
+  .rg-main,
+  .rg-foot-link,
+  .rg-btn,
+  .rg-input {
+    transition: none;
+  }
+}
+
+/* ── Stacked layout: tablet and below ─────────────────────────────────── */
+
+@media (max-width: 1023px) {
+  .rg {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .rg-main {
+    justify-content: flex-start;
+    padding-block: clamp(1.25rem, 4vw, 2rem) clamp(2rem, 6vw, 3rem);
+  }
+
+  .rg-card {
+    max-width: 34rem;
+  }
+}
+
+/* ── Small phones ─────────────────────────────────────────────────────── */
+
+@media (max-width: 639px) {
+  .rg-main {
+    /* 320px reference: keep the gutter without squeezing the controls. */
+    padding-inline: clamp(1rem, 4.5vw, 1.5rem);
+  }
+
+  .rg-foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+}

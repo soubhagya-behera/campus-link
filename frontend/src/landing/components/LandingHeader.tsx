@@ -59,7 +59,7 @@ export default function LandingHeader() {
     <>
       <header className={`cl-head${stuck ? " is-stuck" : ""}`}>
         <div className="cl-shell cl-head-in">
-          <Wordmark to="#top" />
+          <Wordmark to="/" />
 
           <nav className="cl-nav" aria-label="Primary">
             {NAV.map((item) => (
@@ -75,10 +75,10 @@ export default function LandingHeader() {
           </nav>
 
           <div className="cl-head-cta">
-            <Link className="cl-link" to="/app">
+            <Link className="cl-link" to="/login">
               Log in <Arrow />
             </Link>
-            <Link className="cl-btn cl-btn--primary" to="/app">
+            <Link className="cl-btn cl-btn--primary" to="/register">
               Get started <Arrow />
             </Link>
             <button
@@ -104,10 +104,10 @@ export default function LandingHeader() {
           ))}
         </nav>
         <div className="cl-drawer-cta">
-          <Link className="cl-btn cl-btn--primary cl-btn--lg" to="/app" onClick={() => setOpen(false)}>
+          <Link className="cl-btn cl-btn--primary cl-btn--lg" to="/register" onClick={() => setOpen(false)}>
             Get started <Arrow />
           </Link>
-          <Link className="cl-btn cl-btn--quiet cl-btn--lg" to="/app" onClick={() => setOpen(false)}>
+          <Link className="cl-btn cl-btn--quiet cl-btn--lg" to="/login" onClick={() => setOpen(false)}>
             Log in
           </Link>
         </div>

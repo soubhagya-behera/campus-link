@@ -28,13 +28,57 @@ recovery, and production secrets are addressed (see Security posture).
   sessions return 401. No session listing/rotation endpoints yet.
 - Roles: `STUDENT` (owns one profile), `RECRUITER` (owns one company via
   `User.companyId`), `STAFF` = placement officer, `ADMIN` = full access.
+- Public student registration (below) is the only route that creates accounts
+  without an operator; everything else is still provisioned through
+  `backend/scripts/Provision-User.ps1`.
+
+### Student registration (public, no session required)
+
+Three steps, one browser URL (`/register`). Email is proven before any account
+exists: `POST /register/start` and `POST /register/verify` never write to
+`User` or `StudentProfile`.
+
+- `POST /api/auth/register/start`
+  `{ fullName, enrollmentNo, graduationYear 2020–2035, branch, institution?,
+  email }` → 200 `{ attemptId, emailMasked, expiresAt, resendAvailableAt,
+  codeLength, maxAttempts }`. Emails a 6-digit code. 409 if the email or the
+  registration number already exists (or is held by another email's in-flight
+  attempt); 429 during the 60s resend cooldown or after 5 sends; 503 if mail is
+  not configured. Schema is `.strict()`, so `role`, `isActive`, `companyId`
+  and `studentProfileId` are rejected as unknown keys — a public caller cannot
+  choose a role. Rate-limited 20/15min/IP.
+- `POST /api/auth/register/verify` `{ attemptId, code }` → 200
+  `{ attemptId, completionToken, emailMasked, expiresAt }`. 400 wrong code,
+  404 unknown/consumed attempt, 409 code already used, 410 expired, 429 after
+  5 wrong attempts. Rate-limited 60/15min/IP.
+- `POST /api/auth/register/complete` `{ attemptId, completionToken, password }`
+  → 201 `{ user }` **and** the same HttpOnly session cookie `POST /login` sets.
+  The profile is copied from the verified attempt row, not from the request, so
+  a browser cannot swap the email or registration number after verifying. 409
+  duplicate email/registration number or an already-completed attempt (this is
+  also the concurrency guard: two simultaneous completes yield one 201 and one
+  409); 410 expired or wrong completion token; 422 email not verified. Password
+  policy: 12–256 characters, at least one letter and one number. Rate-limited
+  20/15min/IP.
+
+Guarantees: codes come from `crypto.randomInt` (rejection-sampled, no modulo
+bias) and are stored only as HMAC-SHA256 keyed on the attempt id; they are
+single-use (cleared on success), expiry-capped (10 min), attempt-capped (5) and
+resend-capped (5 sends, 60s apart). A verified email authorises account
+creation only through a single-use `completionToken` valid for 20 minutes, and
+  that token lives in browser memory only — never in storage. Emails are
+  normalised to lower case and registration numbers to upper case; the number
+  must be exactly 8 ASCII alphanumerics (for example `21BFH987`), so one
+  person cannot register twice by retyping.
+Passwords, codes, SMTP credentials and session secrets are never logged.
 - CSRF: mutations carrying `Origin`/`Referer` must match `CORS_ORIGIN`
   (default `http://127.0.0.1:5173`), else 403. Cookie-authenticated mutations
   with neither header are also 403; headerless calls without a session cookie
   (curl, server-to-server) pass this check and remain subject to auth +
   ownership. CORS allows credentials only for that origin; other origins get
   no access headers.
-- Provisioning (no public registration): prefer
+- Provisioning (for placement/recruiter/staff accounts; students self-register
+  via the verified flow above): prefer
   `backend/scripts/Provision-User.ps1` (masked prompt) or
   `PROVISION_PASSWORD=… npx tsx scripts/provision-user.ts --email … --role …
   [--student-profile-id … | --company-id …]`. Creates only; validates
@@ -48,8 +92,9 @@ recovery, and production secrets are addressed (see Security posture).
 | 404 | unknown student / job / application / assessment / attempt / session |
 | 401 | missing/invalid/expired/revoked session, or inactive account |
 | 403 | authenticated but not permitted (wrong role, foreign record, foreign transition) |
-| 409 | duplicate application (pre-check or unique-constraint race) |
-| 422 | legal request, illegal state (closed posting, bad transition, corrupt session) |
+| 409 | duplicate application (pre-check or unique-constraint race); registration: duplicate email or registration number |
+| 410 | registration: expired code, or expired/incorrect completion token |
+| 422 | legal request, illegal state (closed posting, bad transition, corrupt session, unverified email at `register/complete`) |
 | 500 | sanitized `Internal server error`; full message logged server-side only |
 | 503 | `GET /api/ready` when PostgreSQL is unreachable |
 
@@ -179,6 +224,10 @@ provisioned; it confers nothing by itself.
 - Env: `DATABASE_URL` (secret, gitignored), `PORT` (default 4000),
   `HOST` (default 127.0.0.1 — keep), `CORS_ORIGIN` (default
   `http://127.0.0.1:5173`), `VITE_API_BASE_URL` (frontend, no secrets).
+  Mail (required for registration, see `backend/.env.example`): `SMTP_HOST`,
+  `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM`. Optional
+  `OTP_PEPPER` sets a stable HMAC key for codes; without it a random per-process
+  key is generated, so codes do not survive an API restart.
 - DB: `npx prisma migrate dev` (dev) / `migrate deploy` (prod-like);
   `npm run prisma:seed` is idempotent synthetic demo content (`demo.*` ids).
   Migrations are forward-only; no reset/wipe tooling is provided on purpose.
@@ -197,8 +246,10 @@ origin; others get no access headers), CSRF origin check on mutations,
 validation, sanitized errors, global rate limiting (300/15min/IP) plus a
 login budget (20/15min/IP), scrypt passwords, hash-only session storage,
 server-side role + ownership checks on every route above (tested, including
-cross-student and cross-company attempts), no secrets in Git.
-**Remaining for public deployment:** email verification, password
-recovery/change, session listing/rotation, production secrets management
-(`COOKIE_SECURE=1` + HTTPS), login alerting, and periodic purge of expired
-sessions. Until then, do not expose.
+cross-student and cross-company attempts), no secrets in Git, and email
+verification on public student signup (single-use hashed codes, attempt and
+resend caps, role forced to `STUDENT`).
+**Remaining for public deployment:** password recovery/change, session
+listing/rotation, production secrets management (`COOKIE_SECURE=1` + HTTPS),
+login alerting, and periodic purge of expired sessions and consumed
+registration attempts. Until then, do not expose.

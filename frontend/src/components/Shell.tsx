@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { fetchHealth, fetchReady, type ApiStatus } from "../lib/api";
 import { cn } from "../lib/cn";
-import { useProfile, useReadiness } from "../store/session";
+import { isPlacement, useProfile, useReadiness, useSessionUser } from "../store/session";
 
 interface NavItem {
   to: string;
@@ -57,6 +57,8 @@ export default function Shell() {
   const [ready, setReady] = useState<ApiStatus | null>(null);
   const readiness = useReadiness();
   const profile = useProfile();
+  const user = useSessionUser();
+  const placement = isPlacement(user);
   const location = useLocation();
 
   useEffect(() => {
@@ -92,7 +94,7 @@ export default function Shell() {
         </div>
 
         <p className="mt-8 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500">
-          Student
+          {placement ? "Workspace" : "Student"}
         </p>
         <nav className="mt-2 space-y-1">
           {STUDENT_NAV.map((n) => (
@@ -115,28 +117,34 @@ export default function Shell() {
           ))}
         </nav>
 
-        <p className="mt-6 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500">
-          Placement cell
-        </p>
-        <nav className="mt-2 space-y-1">
-          {STAFF_NAV.map((n) => (
-            <NavLink
-              key={n.to}
-              to={n.to}
-              className={({ isActive }) =>
-                cn(
-                  "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-sky-400/10 text-sky-300"
-                    : "text-slate-400 hover:bg-white/5 hover:text-white",
-                )
-              }
-            >
-              <n.icon size={17} strokeWidth={2.2} />
-              {n.label}
-            </NavLink>
-          ))}
-        </nav>
+        {/* The backend enforces STAFF/ADMIN on /api/tower/*; hiding the link
+            from other roles avoids sending them to a guaranteed 403. */}
+        {placement ? (
+          <>
+            <p className="mt-6 px-2 font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500">
+              Placement cell
+            </p>
+            <nav className="mt-2 space-y-1">
+              {STAFF_NAV.map((n) => (
+                <NavLink
+                  key={n.to}
+                  to={n.to}
+                  className={({ isActive }) =>
+                    cn(
+                      "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
+                      isActive
+                        ? "bg-sky-400/10 text-sky-300"
+                        : "text-slate-400 hover:bg-white/5 hover:text-white",
+                    )
+                  }
+                >
+                  <n.icon size={17} strokeWidth={2.2} />
+                  {n.label}
+                </NavLink>
+              ))}
+            </nav>
+          </>
+        ) : null}
 
         <div className="mt-auto rounded-2xl border border-white/8 bg-white/[0.02] p-4">
           <div className="flex items-center justify-between">
@@ -169,7 +177,7 @@ export default function Shell() {
                 {profile.data ? `${profile.data.fullName} · ${profile.data.branch ?? ""}` : "CAMPUSLINK"}
               </p>
               <p className="font-mono text-[10px] uppercase tracking-widest text-slate-500">
-                Dev build — no auth yet · writes are local-only
+                {user ? `Signed in as ${user.email} · ${user.role}` : "Local session"}
               </p>
             </div>
             <div className="ml-auto flex items-center gap-2">
@@ -179,7 +187,7 @@ export default function Shell() {
           </div>
           {/* Mobile nav */}
           <nav className="flex gap-1 overflow-x-auto px-4 pb-3 lg:hidden">
-            {[...STUDENT_NAV, ...STAFF_NAV].map((n) => (
+            {(placement ? [...STUDENT_NAV, ...STAFF_NAV] : STUDENT_NAV).map((n) => (
               <NavLink
                 key={n.to}
                 to={n.to}
@@ -207,7 +215,7 @@ export default function Shell() {
         <footer className="border-t border-white/8 px-8 py-4">
           <p className="font-mono text-[11px] text-slate-600">
             CAMPUSLINK dev build · local PostgreSQL + Express API · rule-based scoring, no AI
-            predictions · no authentication yet — do not expose publicly
+            predictions · localhost only — do not expose publicly
           </p>
         </footer>
       </div>

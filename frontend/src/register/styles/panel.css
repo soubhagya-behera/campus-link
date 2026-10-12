@@ -1,0 +1,185 @@
+/* ============================================================================
+   The image panel.
+
+   The photograph is shown cleanly: no text, logo, badge, button or gradient
+   is ever drawn over it. Branding and messaging live in .rg-panel-body, a
+   separate solid forest surface below the image. Crop for
+   /images/register-student.png (1536 × 1024, 3:2): the face sits left of
+   centre and the hands on the keyboard right of centre, so the frame stays
+   near 48% horizontally with the face kept high in the frame.
+   ========================================================================= */
+
+.rg-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--rg-forest);
+}
+
+/* Clean photo surface — no overlay, no text over the image. */
+.rg-panel-photo {
+  overflow: hidden;
+  background: var(--rg-forest);
+}
+
+.rg-panel-media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Keeps the face (left-of-centre) and the hands (right-of-centre) in frame. */
+  object-position: 48% 30%;
+}
+
+/* Separate solid surface below the photograph; never overlaid on it. */
+.rg-panel-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  color: #f5f4ee;
+  background: var(--rg-forest);
+}
+
+.rg-mark {
+  width: 34px;
+  height: 34px;
+  color: #f5f4ee;
+}
+
+.rg-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.rg-brand-name {
+  font-family: var(--rg-display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.rg-brand-sub {
+  display: block;
+  font-family: var(--rg-mono);
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(245 244 238 / 0.72);
+  margin-top: 0.15rem;
+}
+
+.rg-panel h1 {
+  margin: 1rem 0 0.5rem;
+  font-family: var(--rg-display);
+  font-size: clamp(1.6rem, 1.1rem + 1.6vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  max-width: 14ch;
+}
+
+.rg-panel-lede {
+  margin: 0;
+  font-size: clamp(0.9375rem, 0.88rem + 0.25vw, 1rem);
+  line-height: 1.5;
+  color: rgb(245 244 238 / 0.88);
+  max-width: 34ch;
+}
+
+.rg-panel-note {
+  margin: 1rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgb(245 244 238 / 0.22);
+  font-family: var(--rg-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(245 244 238 / 0.7);
+}
+
+/* Desktop: editorial column, photo on top and copy below — never overlaid. */
+@media (min-width: 1024px) {
+  .rg-panel {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  .rg-panel-photo {
+    flex: 0 0 52%;
+    min-height: 0;
+  }
+
+  .rg-panel-body {
+    flex: 1 1 auto;
+  }
+}
+
+/* Tablet and mobile: compact banner above the form, copy below the photo. */
+@media (max-width: 1023px) {
+  .rg-panel-photo {
+    height: clamp(150px, 24vh, 230px);
+  }
+
+  .rg-panel-media {
+    object-position: 50% 26%;
+  }
+
+  .rg-panel-body {
+    padding: 1rem clamp(1rem, 4.5vw, 2.5rem) 1.1rem;
+  }
+
+  .rg-panel h1 {
+    font-size: clamp(1.3rem, 1.1rem + 2vw, 1.8rem);
+    max-width: 22ch;
+    margin: 0.75rem 0 0.35rem;
+  }
+
+  .rg-panel-lede {
+    font-size: 0.9rem;
+    max-width: 52ch;
+  }
+
+  .rg-panel-note {
+    display: none;
+  }
+
+  .rg-mark {
+    width: 28px;
+    height: 28px;
+  }
+
+  .rg-brand-sub {
+    display: none;
+  }
+}
+
+@media (max-width: 639px) {
+  .rg-panel-photo {
+    height: 148px;
+  }
+
+  .rg-panel-media {
+    object-position: 50% 24%;
+  }
+}
+
+@media (max-width: 359px) {
+  .rg-panel-photo {
+    height: 132px;
+  }
+
+  .rg-panel h1 {
+    font-size: 1.25rem;
+  }
+
+  .rg-panel-lede {
+    font-size: 0.85rem;
+  }
+}

@@ -1,0 +1,180 @@
+﻿/* ============================================================================
+   Registration controls: alerts, the password requirement checklist, and
+   buttons. Split out of form.css purely to keep each file comfortably short.
+   ========================================================================= */
+
+/* ── Alerts ───────────────────────────────────────────────────────────── */
+
+.rg-alert {
+  display: flex;
+  gap: 0.6rem;
+  margin: 0 0 0.8rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--rg-danger-line);
+  border-radius: var(--rg-r-sm);
+  background: var(--rg-danger-wash);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--rg-danger);
+}
+
+.rg-alert--info {
+  border-color: var(--rg-line);
+  background: var(--rg-surface);
+  color: var(--rg-mute);
+}
+
+.rg-alert strong {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-weight: 700;
+  color: var(--rg-ink);
+}
+
+.rg-alert--info strong {
+  color: var(--rg-forest);
+}
+
+/* ── Requirements checklist (step 3) ──────────────────────────────────── */
+
+.rg-reqs {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0 0 1.25rem;
+  padding: 0.9rem 1rem;
+  list-style: none;
+  border: 1px solid var(--rg-line);
+  border-radius: var(--rg-r-sm);
+  background: var(--rg-surface);
+}
+
+.rg-req {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.8125rem;
+  color: var(--rg-sage-deep);
+  transition: color var(--rg-t-fast) linear;
+}
+
+.rg-req-tick {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  border: 1px solid var(--rg-line);
+  border-radius: 50%;
+  background: var(--rg-canvas);
+  color: transparent;
+  transition:
+    background-color var(--rg-t-fast) linear,
+    border-color var(--rg-t-fast) linear,
+    color var(--rg-t-fast) linear;
+}
+
+.rg-req.is-met {
+  color: var(--rg-forest);
+}
+
+.rg-req.is-met .rg-req-tick {
+  background: var(--rg-forest);
+  border-color: var(--rg-forest);
+  color: var(--rg-canvas);
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+
+.rg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--rg-r-sm);
+  background: var(--rg-forest);
+  color: var(--rg-canvas);
+  font-family: var(--rg-ui);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.008em;
+  cursor: pointer;
+  transition:
+    background-color var(--rg-t-fast) linear,
+    border-color var(--rg-t-fast) linear,
+    color var(--rg-t-fast) linear,
+    box-shadow var(--rg-t-mid) var(--rg-ease);
+}
+
+.rg-btn:hover:not(:disabled) {
+  background: var(--rg-forest-2);
+}
+
+.rg-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.rg-btn:disabled {
+  background: var(--rg-line);
+  color: var(--rg-sage);
+  cursor: not-allowed;
+}
+
+.rg-btn--block {
+  width: 100%;
+  margin-top: 0.35rem;
+}
+
+/* ── Inline spinner; the label stays put so the button never changes size ── */
+
+.rg-spin {
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 1.5px solid rgb(245 244 238 / 0.35);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: rg-spin 0.7s linear infinite;
+}
+
+@keyframes rg-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rg-spin {
+    animation: none;
+  }
+  .rg-btn:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* ── Verification summary (step 2) ────────────────────────────────────── */
+
+.rg-sent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem;
+  margin: 0 0 0.9rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--rg-line);
+  border-left: 3px solid var(--rg-forest);
+  border-radius: var(--rg-r-sm);
+  background: var(--rg-surface);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--rg-mute);
+}
+
+.rg-sent-email {
+  font-family: var(--rg-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--rg-forest);
+  overflow-wrap: anywhere;
+}
