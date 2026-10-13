@@ -2,7 +2,7 @@ import { useRef, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { useScrollProgress } from "../hooks/useReveal";
 import { Arrow } from "./bits";
-import HeroScene from "./HeroScene";
+import HeroVideo from "./HeroVideo";
 
 const PROOF = ["No black-box scoring", "Every claim links to a record", "Also used by placement cells"];
 
@@ -52,7 +52,7 @@ export default function Hero() {
           </ul>
         </div>
 
-        <HeroScene />
+        <HeroVideo />
       </div>
     </section>
   );
