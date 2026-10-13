@@ -1,6 +1,5 @@
 import {
   Backpack,
-  Bell,
   Briefcase,
   Dumbbell,
   Fingerprint,
@@ -23,7 +22,6 @@ import { fetchHealth, fetchReady, type ApiStatus } from "../lib/api";
 import { cn } from "../lib/cn";
 import { api } from "../lib/server";
 import { unreadCount } from "../lib/announcements";
-import { Mark } from "../landing/components/bits";
 import MobileMenu from "./MobileMenu";
 import { isPlacement, useProfile, useProfileId, useReadiness, useSessionUser, useTower } from "../store/session";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -61,62 +59,7 @@ function navHash(to: string): string {
   return i >= 0 ? to.slice(i) : "";
 }
 
-function StatusPill({ label, status }: { label: string; status: ApiStatus | null }) {
-  return (
-    <span
-      className="inline-flex items-center gap-1.5 rounded-full border border-[var(--ws-line)] bg-[var(--ws-surface)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-[var(--ws-faint)]"
-      title={status?.latencyMs != null ? `${status.latencyMs}ms` : "checking…"}
-    >
-      <span
-        className={cn(
-          "inline-block h-1.5 w-1.5 rounded-full",
-          status == null ? "bg-[#849581]" : status.ok ? "bg-[var(--ws-forest)] live-dot" : "bg-[var(--ws-err)]",
-        )}
-      />
-      {label} {status == null ? "…" : status.ok ? "live" : "down"}
-    </span>
-  );
-}
-
-/** Original CAMPUSLINK brand: the landing mark at its own aspect ratio, plus
- *  wordmark and tagline where space permits. */
-function Brand({ compact = false }: { compact?: boolean }) {
-  return (
-    <span className="flex min-w-0 items-center gap-2.5">
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[var(--ws-forest)]">
-        <Mark className="h-5 w-5 text-[var(--ws-canvas)]" />
-      </span>
-      <span className="min-w-0">
-        <span className="block truncate text-[15px] font-bold tracking-tight text-[var(--ws-ink)]">
-          CAMPUSLINK
-        </span>
-        {!compact && (
-          <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--ws-faint)]">
-            Career Intelligence
-          </span>
-        )}
-      </span>
-    </span>
-  );
-}
-
-/** Student notification bell with unread badge (9+ caps large counts). */
-function NoticeBell({ count }: { count: number }) {
-  return (
-    <Link
-      to="/notifications"
-      aria-label={count > 0 ? `Notifications, ${count} unread` : "Notifications"}
-      className="relative grid min-h-[44px] min-w-[44px] place-items-center rounded-lg border border-[var(--ws-line)] text-[var(--ws-forest)]"
-    >
-      <Bell size={18} aria-hidden="true" />
-      {count > 0 && (
-        <span aria-hidden="true" className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[var(--ws-forest)] px-1 font-mono text-[10px] font-bold text-[var(--ws-canvas)]">
-          {count > 9 ? "9+" : count}
-        </span>
-      )}
-    </Link>
-  );
-}
+import { Brand, Identity, NoticeBell, StatusPill } from "./ShellAtoms";
 
 export default function Shell() {
   const [health, setHealth] = useState<ApiStatus | null>(null);
@@ -311,12 +254,31 @@ export default function Shell() {
               <Brand compact />
             </div>
             <div className="hidden min-w-0 lg:block">
-              <p className="truncate text-sm font-semibold text-[var(--ws-ink)]">
-                {profile.data ? `${profile.data.fullName} · ${profile.data.branch ?? ""}` : user ? `Signed in as ${user.email}` : "CAMPUSLINK"}
-              </p>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--ws-faint)]">
-                {user ? `${user.role} workspace` : "Local session"}
-              </p>
+              {placement ? (
+                <Identity
+                  kind="staff"
+                  primary="Placement Team"
+                  secondary={`${user?.role ?? "STAFF"} workspace`}
+                  email={user?.email ?? null}
+                  initials={null}
+                />
+              ) : profile.data ? (
+                <Identity
+                  kind="student"
+                  primary={profile.data.fullName}
+                  secondary={`Student workspace${profile.data.branch ? ` · ${profile.data.branch}` : ""}`}
+                  email={user?.email ?? null}
+                  initials={profile.data.fullName.split(" ").map((w) => w[0]).slice(0, 2).join("")}
+                />
+              ) : (
+                <Identity
+                  kind="other"
+                  primary={user?.email ?? "CAMPUSLINK"}
+                  secondary={user ? `${user.role} workspace` : "Local session"}
+                  email={user?.email ?? null}
+                  initials={null}
+                />
+              )}
             </div>
             {/* Desktop account cluster */}
             <div className="ml-auto hidden items-center gap-2 lg:flex">

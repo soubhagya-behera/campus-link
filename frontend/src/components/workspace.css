@@ -157,3 +157,45 @@
 .ws input[type="radio"] {
   min-height: initial;
 }
+
+/* ── Workspace identity: one gentle entrance, restrained avatar hover ──── */
+
+.ws-id {
+  animation: ws-id-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes ws-id-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ws-id-avatar {
+  box-shadow: 0 1px 3px rgb(32 40 34 / 0.12);
+  transition:
+    box-shadow 140ms linear,
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) {
+  .ws-id:hover .ws-id-avatar {
+    transform: translate3d(0, -1px, 0);
+    box-shadow: 0 4px 10px -4px rgb(23 60 47 / 0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ws-id {
+    animation: none;
+  }
+  .ws-id-avatar {
+    transition: none;
+  }
+  .ws-id:hover .ws-id-avatar {
+    transform: none;
+  }
+}
