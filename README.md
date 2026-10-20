@@ -1,43 +1,183 @@
-<div align="center">
+<div id="hero" align="center">
 
-# CAMPUSLINK
+<img src="./frontend/public/favicon.svg" width="74" height="74" alt="CAMPUSLINK logo" />
 
-**Career intelligence for students. One connected record for placement cells.**
+# 🎯 CAMPUSLINK
+
+### **Career intelligence for students. One connected record for placement cells.**
 
 Record what you can do. Attach the work that supports it. Rank the roles that fit.
-Practice the interview. Move the application forward — without a spreadsheet behind it.
+Practise the interview. Move the application forward — without a spreadsheet behind it.
 
-`React 19` · `TypeScript` · `Express` · `Prisma` · `PostgreSQL`
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=22&duration=2800&pause=1100&color=7D9A2C&center=true&vCenter=true&repeat=true&width=620&height=54&lines=Skills+into+evidence.;Evidence+into+opportunity.;One+connected+career+journey." alt="CAMPUSLINK animated tagline" />
 
-**Local-first. Deterministic. Inspectable.**
+<p>
+  <a href="#product-preview"><img src="https://img.shields.io/badge/Product_preview-inside_the_build-173C2F?style=for-the-badge" alt="Product preview" /></a>
+  <a href="#feature-grid"><img src="https://img.shields.io/badge/Feature_grid-10_surfaces-7D9A2C?style=for-the-badge" alt="Feature grid" /></a>
+  <a href="#what-is-scored-and-how"><img src="https://img.shields.io/badge/Scoring-rule_based-198754?style=for-the-badge" alt="Rule-based scoring" /></a>
+  <a href="#run-it-locally"><img src="https://img.shields.io/badge/Run_it-locally_first-173C2F?style=for-the-badge" alt="Run locally" /></a>
+</p>
+
+<p>
+  <img src="https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 19" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Vite_8-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite 8" />
+  <img src="https://img.shields.io/badge/Tailwind_4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS 4" />
+</p>
+<p>
+  <img src="https://img.shields.io/badge/Node.js_20%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js 20+" />
+  <img src="https://img.shields.io/badge/Express_4-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express 4" />
+  <img src="https://img.shields.io/badge/Prisma_5-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma 5" />
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+</p>
+<p>
+  <img src="https://img.shields.io/badge/Vitest_2-6E9F27?style=for-the-badge&logo=vitest&logoColor=white" alt="Vitest 2" />
+  <img src="https://img.shields.io/badge/Backend_tests-80%2F80_passing-198754?style=for-the-badge" alt="Backend tests: 80 of 80 passing" />
+  <img src="https://img.shields.io/badge/Frontend_build-passing-198754?style=for-the-badge" alt="Frontend build passing" />
+  <img src="https://img.shields.io/badge/Local_first-loopback_demo-173C2F?style=for-the-badge" alt="Local-first loopback demo" />
+</p>
+
+<p>
+  <a href="#why-campuslink">Why</a> ·
+  <a href="#product-preview">Preview</a> ·
+  <a href="#feature-grid">Features</a> ·
+  <a href="#architecture">Architecture</a> ·
+  <a href="#data-model">Data model</a> ·
+  <a href="#security-and-trust">Security</a> ·
+  <a href="#run-it-locally">Setup</a> ·
+  <a href="#api-overview">API</a> ·
+  <a href="#what-is-scored-and-how">Scoring</a> ·
+  <a href="#limitations-and-next-steps">Limitations</a>
+</p>
+
+<img src="./frontend/public/hero-tree-poster.jpg" width="100%" alt="CAMPUSLINK hero artwork — one connected career record" />
 
 </div>
 
-> A skill is a claim. Linked evidence adds context. CAMPUSLINK is built around that distinction.
+> 🧠 **A skill is a claim. Linked evidence adds context.** CAMPUSLINK is built around that distinction.
 
-## Contents
+<div id="product-preview" align="center"></div>
 
-- [Why CAMPUSLINK](#why-campuslink)
-- [What it is](#what-it-is)
-- [Surface map](#surface-map)
-- [The student loop](#the-student-loop)
-- [Architecture](#architecture)
-- [Engineering decisions](#engineering-decisions)
-- [Data model](#data-model)
-- [Security and trust](#security-and-trust)
-- [Stack](#stack)
-- [Repository layout](#repository-layout)
-- [Run it locally](#run-it-locally)
-- [Configuration](#configuration)
-- [Routes](#routes)
-- [API overview](#api-overview)
-- [What is scored, and how](#what-is-scored-and-how)
-- [Demo data and honesty rules](#demo-data-and-honesty-rules)
-- [Testing and quality](#testing-and-quality)
-- [Limitations and next steps](#limitations-and-next-steps)
-- [Further reading](#further-reading)
+## 📸 Product Preview
 
-## Why CAMPUSLINK
+<table>
+  <tr>
+    <td width="58%" valign="top">
+      <img src="./frontend/public/hero-tree-poster.jpg" width="100%" alt="CAMPUSLINK hero artwork — a stylised career record tree" />
+      <p align="center"><b>Landing-page brand art</b><br>The poster frame behind the public page’s motion sequence.</p>
+    </td>
+    <td width="42%" valign="top">
+      <img src="./frontend/public/images/register-student.png" width="100%" alt="CAMPUSLINK student registration interface" />
+      <p align="center"><b>Student registration</b><br>Email code → password → real `STUDENT` account.</p>
+    </td>
+  </tr>
+</table>
+
+<details>
+<summary>🎥 Landing-page motion preview</summary>
+
+The build includes `frontend/public/gemini_generated_video_452e3e23.mp4`. GitHub opens MP4s through
+its file viewer rather than autoplaying them like an animated GIF:
+[`gemini_generated_video_452e3e23.mp4`](./frontend/public/gemini_generated_video_452e3e23.mp4).
+
+</details>
+
+---
+
+<div id="feature-grid" align="center"></div>
+
+## ✨ Feature Grid
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 🔭 Career Twin
+
+Splits a student record into proficiency claims and linked project evidence, then shows the
+readiness inputs underneath.
+
+</td>
+<td width="50%" valign="top">
+
+### 🎯 Opportunity Mirror
+
+Ranks open drives against the recorded profile and names each met requirement, gap and bonus.
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 🏅 Skill Sprint
+
+Runs short briefs, grades them against the public rubric and records a passing attempt as
+linked evidence.
+
+</td>
+<td width="50%" valign="top">
+
+### 🚦 Applications
+
+One record per job, duplicate prevention, guarded transitions and student-owned withdrawals.
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 🎤 Interview Arena
+
+Curated prompts, rule-based answer grading and a session-keyed points ledger.
+
+</td>
+<td width="50%" valign="top">
+
+### 🪪 Proof Passport
+
+Reports per-skill provenance and makes today’s independent-verification count honest: zero.
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 🗼 Placement Tower
+
+Batch counts, open drives, application spread, readiness distribution and a demo-seed flag.
+
+</td>
+<td width="50%" valign="top">
+
+### 👥 Students & review
+
+A branch-filterable directory and read-only student profile view for placement review.
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 📣 Announcements & notices
+
+Publishes notices into an in-app, materialised audience with unread counts.
+
+</td>
+<td width="50%" valign="top">
+
+### 🧠 Arena Bank
+
+Adds, edits, deactivates or removes interview questions in one managed bank.
+
+</td>
+</tr>
+</table>
+
+---
+
+<a id="why-campuslink"></a>
+
+## 🌲 Why CAMPUSLINK
 
 Students describe themselves in résumés. Placement cells track them in spreadsheets. Job
 portals rank them with scores nobody can inspect. Each system knows a different version of
@@ -57,7 +197,9 @@ The result is a local-first working system with two connected workspaces:
 - **Placement cells** publish drives, review applicants, see batch-level activity, send
   in-app announcements and manage the interview question bank.
 
-## What it is
+---
+
+## 🛠️ What it is
 
 CAMPUSLINK is a monorepo with a React/Vite frontend and an Express/TypeScript/Prisma API.
 It is designed to run on one machine against a local PostgreSQL database. There is no hosted
@@ -72,7 +214,7 @@ deployment, no Docker dependency and no analytics integration configured in this
 Placement announcements and the resulting student notifications are in-app records in
 PostgreSQL; general email, SMS and push notification delivery are not implemented.
 
-| | Student workspace | Placement workspace |
+| Dimension | 🧭 Student workspace | 🏛️ Placement workspace |
 | --- | --- | --- |
 | **Purpose** | Link claims to evidence, then act on it | Run drives and review the batch from live records |
 | **Core surfaces** | Career Twin, Opportunity Mirror, Skill Sprint, Applications, Interview Arena, Proof Passport | Placement Tower, Company Drives, Applications, Students, Announcements, Arena Bank |
@@ -83,9 +225,9 @@ PostgreSQL; general email, SMS and push notification delivery are not implemente
 > build has no recruiter portal. Recruiter accounts see an explicit "portal unavailable" state
 > rather than a student workspace.
 
-## Surface map
+## 🗺️ Surface map
 
-### Student workspace
+### 🎓 Student workspace
 
 | Surface | Route | What it does |
 | --- | --- | --- |
@@ -98,7 +240,7 @@ PostgreSQL; general email, SMS and push notification delivery are not implemente
 | **Proof Passport** | `/passport` | Per-skill provenance, rubric-assessed attempts and the limits of what has been independently verified |
 | **Notifications** | `/notifications` | Student-own in-app notices from placement announcements |
 
-### Placement workspace
+### 🏛️ Placement workspace
 
 | Surface | Route | What it does |
 | --- | --- | --- |
@@ -111,7 +253,7 @@ PostgreSQL; general email, SMS and push notification delivery are not implemente
 | **Announcements** | `/tower/announcements` | Publish notices to a materialised audience and see unread counts |
 | **Arena Bank** | `/tower/arena` | Add, edit, deactivate or delete questions in the managed interview bank |
 
-## The student loop
+## 🔄 The student loop
 
 ```mermaid
 flowchart LR
@@ -145,7 +287,9 @@ Neither is presented as independent verification; the Proof Passport reports
 `independentlyVerifiedItems: 0` today. Evidence contributes to scoring, but it is not a
 prerequisite for required-skill credit when the recorded level already meets the minimum.
 
-## Architecture
+<a id="architecture" align="center"></a>
+
+## 🏗️ Architecture
 
 ```mermaid
 flowchart TB
@@ -177,7 +321,27 @@ The public landing page is deliberately outside `SessionProvider`. A visitor wit
 stopped still gets the full page; authenticated routes redirect to `/login?next=…` and return
 after sign-in.
 
-## Engineering decisions
+### 🚦 Application transitions
+
+```mermaid
+stateDiagram-v2
+    [*] --> APPLIED
+    APPLIED --> SHORTLISTED: recruiter/placement
+    APPLIED --> REJECTED: recruiter/placement
+    APPLIED --> WITHDRAWN: student/placement
+    SHORTLISTED --> HIRED: placement
+    SHORTLISTED --> REJECTED: recruiter/placement
+    SHORTLISTED --> WITHDRAWN: student/placement
+    HIRED --> [*]
+    REJECTED --> [*]
+    WITHDRAWN --> [*]
+```
+
+`APPLIED` itself is never a legal backward target. Drive status lives in the ordinary
+`DRAFT`/`OPEN`/`CLOSED` management workflow and is not governed by the same guarded,
+server-enforced state machine.
+
+## 🧠 Engineering decisions
 
 | Decision | Why | Trade-off |
 | --- | --- | --- |
@@ -200,7 +364,9 @@ general email, SMS or push notification delivery—SMTP is limited to registrati
 verification. No password recovery. No placement-outcome analytics. These are scope
 boundaries, not hidden claims.
 
-## Data model
+<a id="data-model" align="center"></a>
+
+## 🗃️ Data model
 
 The Prisma schema is the source of truth. The simplified map below shows the relationships
 that drive the product.
@@ -242,7 +408,9 @@ Two details matter for correctness:
 - `AnnouncementRecipient` rows are materialised at publish time in one transaction, freezing
   the audience to whoever matched then.
 
-## Security and trust
+<a id="security-and-trust" align="center"></a>
+
+## 🛡️ Security and trust
 
 | Control | Implementation |
 | --- | --- |
@@ -261,7 +429,9 @@ Two details matter for correctness:
 rotation, production secret management, login alerting, and periodic purge of expired
 sessions and consumed registration attempts. This build is loopback-only for those reasons.
 
-## Stack
+---
+
+## 🧩 Stack
 
 | Layer | Technology |
 | --- | --- |
@@ -275,7 +445,12 @@ sessions and consumed registration attempts. This build is loopback-only for tho
 | **Mail** | Nodemailer over SMTP, used only for signup codes |
 | **Tests** | Vitest 2 |
 
-## Repository layout
+---
+
+## 🗂️ Repository layout
+
+<details>
+<summary><b>🧩 Full repository layout</b></summary>
 
 ```text
 CAMPUSLINK/
@@ -313,7 +488,11 @@ CAMPUSLINK/
 └── README.md
 ```
 
-## Run it locally
+</details>
+
+<a id="run-it-locally" align="center"></a>
+
+## 🚀 Run it locally
 
 ### Prerequisites
 
@@ -425,7 +604,12 @@ environment to `scripts/provision-user.ts`; it is never printed or written to so
 Press `Ctrl+C` in each terminal. The API stops accepting connections, then releases the
 Prisma pool, with a 10-second fallback exit.
 
-## Configuration
+---
+
+## ⚙️ Configuration
+
+<details>
+<summary><b>🔧 Environment variables</b></summary>
 
 | Variable | Where | Required | Notes |
 | --- | --- | --- | --- |
@@ -445,7 +629,9 @@ Prisma pool, with a 10-second fallback exit.
 
 Only `*.example` files are committed. Never commit real credentials.
 
-## Routes
+</details>
+
+## 🧭 Routes
 
 ### Public
 
@@ -456,7 +642,8 @@ Only `*.example` files are committed. Never commit real credentials.
 | `/register` | Email-verified student registration |
 | `*` | Branded 404 |
 
-### Authenticated
+<details>
+<summary><b>🧾 Authenticated routes</b></summary>
 
 | Route | Workspace | Purpose |
 | --- | --- | --- |
@@ -475,11 +662,18 @@ Only `*.example` files are committed. Never commit real credentials.
 | `/tower/announcements` | Placement | Announcements |
 | `/tower/arena` | Placement | Arena question bank |
 
-## API overview
+</details>
+
+<a id="api-overview" align="center"></a>
+
+## 🔌 API overview
 
 Every endpoint is under `/api`. Success responses are `{ ok: true, data, ... }`; failures are
 `{ ok: false, error, details? }`. Dates are ISO-8601 strings. Paginated list endpoints use
 `page`, `limit` (1–50, default 20) and `total`, newest first unless stated.
+
+<details>
+<summary><b>🧰 Full endpoint map</b></summary>
 
 | Domain | Representative endpoints |
 | --- | --- |
@@ -497,6 +691,8 @@ Every endpoint is under `/api`. Success responses are `{ ok: true, data, ... }`;
 | **Announcements** | `POST/GET /api/announcements`, `GET /api/announcements/recipients/preview` |
 | **Notifications** | `GET /api/notifications`, `GET /api/notifications/unread-count`, `POST /api/notifications/:id/read`, `/read-all` |
 
+</details>
+
 Role and ownership rules are enforced server-side. For example:
 
 - `GET /api/students` is `STAFF`/`ADMIN` only.
@@ -510,7 +706,9 @@ Role and ownership rules are enforced server-side. For example:
 See [`docs/API-CONTRACT.md`](docs/API-CONTRACT.md) for the application transition matrix,
 validation rules, status codes and ownership checks.
 
-## What is scored, and how
+<a id="what-is-scored-and-how" align="center"></a>
+
+## 🔢 What is scored, and how
 
 Scoring is deterministic and rule-based; no model, embedding, generative component or
 external scoring API is involved. The detailed endpoints expose their scoring metadata:
@@ -546,7 +744,7 @@ Two caveats are part of the design:
 - The What-If Lab is client-side illustrative arithmetic. There is no server endpoint because
   the project has no validated placement-outcome data to calibrate against.
 
-## Demo data and honesty rules
+## 🧪 Demo data and honesty rules
 
 `npm run prisma:seed` installs idempotent synthetic content:
 
@@ -573,9 +771,9 @@ The honesty rules used throughout the product:
 - There are no offer, package or placement-outcome metrics in this build.
 - Public student signup creates only a `STUDENT`; role fields are rejected as unknown keys.
 
-## Testing and quality
+## 🧫 Testing and quality
 
-### Backend
+### 🧪 Backend
 
 ```powershell
 cd backend
@@ -591,7 +789,7 @@ guarantee):
 - Coverage includes auth, CSRF, registration, student skills, directory scoping, matching,
   Sprint evidence, Arena bank and sessions, application review, notifications and workflows.
 
-### Frontend
+### 🧪 Frontend
 
 ```powershell
 cd frontend
@@ -609,7 +807,9 @@ guarantee):
 There is no frontend unit or end-to-end test suite in this build. Manual verification follows
 [`docs/LOCAL-DEMO.md`](docs/LOCAL-DEMO.md).
 
-## Limitations and next steps
+<a id="limitations-and-next-steps" align="center"></a>
+
+## 🚧 Limitations and next steps
 
 ### Before any public deployment
 
@@ -640,7 +840,7 @@ There is no frontend unit or end-to-end test suite in this build. Manual verific
 - Add an explicit `evidenced` boolean to match factors instead of inferring it from prose in
   the UI.
 
-## Further reading
+## 📚 Further reading
 
 - [`docs/API-CONTRACT.md`](docs/API-CONTRACT.md) — endpoint behaviour, validation, transition
   matrix, formulas and security posture.
@@ -651,7 +851,9 @@ There is no frontend unit or end-to-end test suite in this build. Manual verific
 
 <div align="center">
 
-Built by Bibhudutta & Team.
+<img src="./frontend/public/favicon.svg" width="58" height="58" alt="CAMPUSLINK logo" />
+
+### Built by Bibhudutta & Team.
 
 **Keep it on localhost until the gaps above are closed.**
 
